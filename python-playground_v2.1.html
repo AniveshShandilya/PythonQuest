@@ -1,0 +1,1733 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python Quest v2.1 - Unilever Data Foundations</title>
+<style>
+:root{
+  --navy:#1F2A44; --blue:#0066CC; --teal:#00A79D; --gray:#4B5563;
+  --light-gray:#F3F4F6; --white:#FFFFFF; --red:#DC2626; --orange:#F59E0B;
+  --green:#16A34A; --dark-bg:#160d14; --code-fg:#E6D6C8; --code-border:#3a2330;
+  --gold:#FFD23F;
+  --crimson:#E63946; --flame:#FF5630; --amber:#FFB020; --yellow:#FFD23F; --grape:#7a3cf0;
+  --prose:"Unilever Shilling","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --mono:Consolas,"Courier New",monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;}
+body{
+  font-family:var(--prose); color:var(--navy);
+  background:
+    radial-gradient(1100px 560px at 8% -8%, rgba(230,57,70,.22), transparent 60%),
+    radial-gradient(1000px 520px at 112% 8%, rgba(255,210,63,.15), transparent 55%),
+    radial-gradient(800px 500px at 50% 120%, rgba(122,60,240,.18), transparent 60%),
+    linear-gradient(160deg,#140a10 0%, #1c0f15 45%, #261019 100%);
+  background-attachment:fixed;
+  min-height:100vh; color:#f3e9ef;
+}
+a{color:var(--amber);}
+.wrap{max-width:1180px;margin:0 auto;padding:22px 20px 60px;}
+
+/* HEADER */
+.top{
+  display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+  background:linear-gradient(120deg, rgba(40,12,18,.92), rgba(230,57,70,.42));
+  border:1px solid rgba(255,178,32,.4);
+  border-radius:18px;padding:16px 20px;
+  box-shadow:0 10px 40px rgba(0,0,0,.35);
+  backdrop-filter:blur(4px);
+}
+.logo{
+  width:52px;height:52px;border-radius:14px;flex:0 0 auto;
+  background:linear-gradient(135deg,var(--crimson),var(--amber));
+  display:flex;align-items:center;justify-content:center;
+  font-size:26px;box-shadow:0 6px 18px rgba(230,57,70,.55);
+}
+.title-h{display:flex;flex-direction:column;gap:2px;}
+.title-h h1{font-size:22px;letter-spacing:.3px;color:#fff;}
+.title-h .sub{font-size:12.5px;color:#b9c6dd;}
+.spacer{flex:1;}
+.hud{display:flex;gap:10px;flex-wrap:wrap;}
+.chip{
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);
+  border-radius:999px;padding:7px 13px;font-size:13px;color:#eaf0fb;
+  display:flex;align-items:center;gap:6px;white-space:nowrap;
+}
+.chip b{color:var(--gold);}
+
+/* SAGA STRIP */
+.saga{
+  margin-top:14px;border-radius:16px;padding:14px 18px;
+  background:linear-gradient(100deg, rgba(230,57,70,.16), rgba(255,210,63,.14));
+  border:1px solid rgba(255,210,63,.32);
+  font-size:13.5px;color:#dfe7f3;line-height:1.55;
+}
+.saga b{color:var(--gold);}
+
+/* HERO BANNER */
+.hero{
+  margin:16px auto 4px;max-width:760px;display:flex;flex-direction:column;align-items:center;text-align:center;
+  border-radius:18px;padding:14px 16px 18px;
+  background:radial-gradient(120% 140% at 50% 0%, rgba(122,60,240,.18), rgba(22,13,20,0) 60%),
+             linear-gradient(180deg, rgba(230,57,70,.10), rgba(22,13,20,0));
+  border:1px solid rgba(255,210,63,.22);
+}
+.hero-svg{width:100%;max-width:720px;height:auto;display:block;filter:drop-shadow(0 8px 22px rgba(230,57,70,.28));}
+.hero-tag{
+  margin-top:8px;font-size:14px;font-weight:600;letter-spacing:.2px;
+  color:var(--gold);text-shadow:0 1px 10px rgba(255,210,63,.25);
+}
+@media(max-width:560px){ .hero-tag{font-size:12.5px;} .hero{padding:10px 10px 14px;} }
+
+/* SCREENS */
+.screen{display:none;margin-top:18px;}
+.screen.active{display:block;animation:fade .35s ease;}
+@keyframes fade{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+
+/* ANIME-STYLE CHALLENGE BACKDROP (decorative, offline, character-free) */
+#challengeScreen{position:relative;}
+.anime-bg{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden;border-radius:18px;opacity:.5;}
+.anime-bg svg{width:100%;height:100%;display:block;}
+.anime-bg::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(22,13,20,.55),rgba(22,13,20,.78));}
+#challengeScreen .section-h,#challengeScreen .chal{position:relative;z-index:1;}
+
+.section-h{display:flex;align-items:center;gap:10px;margin:6px 2px 14px;}
+.section-h h2{font-size:18px;color:#fff;}
+.section-h .crumb{font-size:13px;color:#9fb0cc;}
+.btn-back{
+  background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.18);
+  color:#dbe5f5;border-radius:10px;padding:7px 13px;font-size:13px;cursor:pointer;
+  display:inline-flex;align-items:center;gap:6px;
+}
+.btn-back:hover{background:rgba(255,255,255,.14);}
+
+/* WORLD CARDS */
+.worlds{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:16px;}
+.world-card{
+  position:relative;border-radius:18px;padding:18px;cursor:pointer;
+  border:1px solid rgba(255,255,255,.14);color:#fff;overflow:hidden;
+  transition:transform .15s, box-shadow .15s;
+  min-height:148px;display:flex;flex-direction:column;justify-content:space-between;
+}
+.world-card:hover{transform:translateY(-4px);box-shadow:0 16px 40px rgba(0,0,0,.4);}
+.world-card.locked{cursor:not-allowed;filter:grayscale(.7) brightness(.7);}
+.tier-basic{background:linear-gradient(140deg,#FF7A45,#E63946);}
+.tier-inter{background:linear-gradient(140deg,#E63946,#7a3cf0);}
+.tier-adv{background:linear-gradient(140deg,#3a1530,#7a3cf0 55%,#FFB020);}
+.wc-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
+.wc-name{font-size:16px;font-weight:700;line-height:1.25;}
+.wc-tier{font-size:10.5px;text-transform:uppercase;letter-spacing:1px;opacity:.85;margin-top:3px;}
+.wc-ico{font-size:30px;}
+.ring{
+  --p:0; width:46px;height:46px;border-radius:50%;flex:0 0 auto;
+  background:
+    conic-gradient(var(--gold) calc(var(--p)*1%), rgba(255,255,255,.22) 0);
+  display:flex;align-items:center;justify-content:center;
+}
+.ring i{width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.35);
+  display:flex;align-items:center;justify-content:center;font-style:normal;font-size:11px;font-weight:700;}
+.wc-foot{display:flex;justify-content:space-between;align-items:center;font-size:12px;opacity:.92;}
+.wc-lock{font-size:12px;}
+
+/* LEVEL GRID */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:10px;}
+.node{
+  aspect-ratio:1;border-radius:12px;border:1px solid rgba(255,255,255,.15);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  cursor:pointer;color:#fff;font-weight:700;font-size:15px;position:relative;
+  background:rgba(255,255,255,.06);transition:transform .12s;
+}
+.node:hover{transform:scale(1.07);}
+.node.done{background:linear-gradient(140deg,#E63946,#FFB020);border-color:transparent;}
+.node.boss{background:linear-gradient(140deg,#7a3cf0,#FF5630);border-color:var(--gold);}
+.node.boss.done{background:linear-gradient(140deg,#FFB020,#FFD23F);border-color:var(--gold);}
+.node.locked{cursor:not-allowed;opacity:.4;}
+.node .st{font-size:9px;letter-spacing:1px;line-height:1;margin-top:3px;color:var(--gold);}
+.node .bico{position:absolute;top:3px;right:5px;font-size:11px;}
+
+/* CHALLENGE */
+.chal{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+@media(max-width:900px){.chal{grid-template-columns:1fr;}}
+.panel{
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);
+  border-radius:16px;padding:18px;color:#e8eefb;
+}
+.panel h3{color:#fff;font-size:16px;margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+.quest-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;}
+.quest-head h3{margin-bottom:0;}
+.sprite{width:62px;height:62px;flex:0 0 auto;}
+.sprite svg{width:100%;height:100%;display:block;filter:drop-shadow(0 3px 8px rgba(0,0,0,.4));}
+.sprite svg .bob{animation:spriteBob 2.6s ease-in-out infinite;transform-origin:center;}
+@keyframes spriteBob{0%,100%{transform:translateY(0);}50%{transform:translateY(-4px);}}
+.story{
+  background:linear-gradient(120deg, rgba(230,57,70,.18), rgba(122,60,240,.14));
+  border-left:3px solid var(--gold);border-radius:10px;padding:13px 15px;
+  font-size:15px;line-height:1.65;color:#f3e9ef;margin-bottom:12px;
+}
+.task{font-size:17px;line-height:1.65;margin-bottom:14px;color:#f6eef2;font-weight:500;}
+.task code,.story code{background:rgba(0,0,0,.35);padding:1px 6px;border-radius:5px;font-family:var(--mono);font-size:12.5px;color:#9fe;}
+.hints{margin-top:8px;}
+.hint{
+  background:rgba(0,167,157,.1);border:1px solid rgba(0,167,157,.3);
+  border-radius:9px;padding:9px 12px;font-size:13px;margin-bottom:8px;color:#cdeee9;
+  display:none;
+}
+.hint.show{display:block;animation:fade .25s;}
+.hint.reveal{background:rgba(230,57,70,.12);border:1px solid rgba(230,57,70,.4);color:#ffd9dc;}
+.reveal-pre{margin:6px 0 0;padding:8px 10px;background:#0a0a0a;border:1px solid rgba(0,255,65,.35);
+  border-radius:7px;color:#00FF41;font-family:"SFMono-Regular",Consolas,monospace;font-size:13px;
+  white-space:pre-wrap;text-shadow:0 0 6px rgba(0,255,65,.5);}
+.btn-reveal{background:linear-gradient(135deg,var(--crimson),var(--flame));color:#fff;
+  box-shadow:0 6px 16px rgba(230,57,70,.4);font-weight:700;}
+.btn-reveal:hover{filter:brightness(1.08);}
+.btn:disabled{opacity:.55;cursor:not-allowed;filter:grayscale(.3);}
+.btn{
+  border:none;border-radius:10px;padding:10px 16px;font-size:13.5px;font-weight:600;
+  cursor:pointer;font-family:var(--prose);display:inline-flex;align-items:center;gap:7px;
+}
+.btn-ghost{background:rgba(255,255,255,.08);color:#dbe5f5;border:1px solid rgba(255,255,255,.2);}
+.btn-ghost:hover{background:rgba(255,255,255,.15);}
+.btn-teal{background:linear-gradient(135deg,var(--teal),var(--blue));color:#fff;box-shadow:0 6px 16px rgba(0,167,157,.4);}
+.btn-teal:hover{filter:brightness(1.08);}
+.btn-gold{background:linear-gradient(135deg,var(--gold),var(--orange));color:#3a2c00;font-weight:700;}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;}
+
+/* ATTEMPT METER */
+.att-meter{
+  display:flex;align-items:center;gap:10px;margin-top:12px;
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);
+  border-radius:10px;padding:8px 13px;font-size:12.5px;color:#cdd7ea;
+}
+.att-meter .att-label{font-weight:600;letter-spacing:.3px;}
+.att-dots{display:flex;gap:6px;}
+.att-dots i{
+  width:13px;height:13px;border-radius:50%;display:inline-block;
+  background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.25);
+  transition:background .2s, transform .2s;
+}
+.att-dots i.miss{background:var(--orange);border-color:var(--orange);transform:scale(1.12);}
+.att-dots i.crit{background:var(--red);border-color:var(--red);}
+.att-meter .att-count{margin-left:auto;font-weight:700;color:#fff;}
+.att-meter.warn{border-color:rgba(245,158,11,.5);background:rgba(245,158,11,.1);}
+.att-meter.locked{border-color:rgba(220,38,38,.55);background:rgba(220,38,38,.12);color:#ffd9d9;}
+.att-meter .att-hint{font-size:11.5px;color:#9fb0cc;}
+
+/* EDITOR - MATRIX TERMINAL */
+:root{ --mx-green:#00FF41; --mx-dim:#0a8a2a; --mx-bg:#000600; --mx-border:#0c5; }
+.editor-head{
+  background:linear-gradient(180deg,#011a06,#000600);color:var(--mx-green);
+  border:1px solid var(--mx-border);border-bottom:none;border-radius:12px 12px 0 0;
+  padding:8px 14px;font-size:12.5px;font-weight:600;letter-spacing:1px;
+  font-family:var(--mono);text-shadow:0 0 7px rgba(0,255,65,.55);
+  display:flex;align-items:center;gap:8px;justify-content:space-between;
+}
+.editor-head .dots{display:flex;gap:6px;}
+.editor-head .dots i{width:11px;height:11px;border-radius:50%;display:inline-block;box-shadow:0 0 6px currentColor;}
+.code-wrap{position:relative;border-radius:0 0 12px 12px;overflow:hidden;}
+.code-rain{
+  position:absolute;inset:0;z-index:0;pointer-events:none;opacity:.16;
+  background:
+    repeating-linear-gradient(90deg, rgba(0,255,65,.08) 0 1px, transparent 1px 16px),
+    radial-gradient(120% 60% at 50% -10%, rgba(0,255,65,.18), transparent 60%);
+  animation:mxscroll 7s linear infinite;
+}
+@keyframes mxscroll{from{background-position:0 0,0 0;}to{background-position:0 240px,0 0;}}
+textarea.code{
+  position:relative;z-index:1;
+  width:100%;min-height:240px;resize:vertical;
+  border:1px solid var(--mx-border);border-top:none;border-radius:0 0 12px 12px;
+  background:rgba(0,6,0,.92);color:var(--mx-green);caret-color:var(--mx-green);
+  font-family:var(--mono);font-size:13.5px;line-height:1.55;padding:14px;tab-size:4;
+  outline:none;text-shadow:0 0 6px rgba(0,255,65,.45);
+  box-shadow:inset 0 0 22px rgba(0,255,65,.12);
+}
+textarea.code:focus{border-color:var(--mx-green);box-shadow:inset 0 0 28px rgba(0,255,65,.2),0 0 14px rgba(0,255,65,.25);}
+.out-head{
+  background:linear-gradient(180deg,#011a06,#000600);color:var(--mx-green);
+  border:1px solid var(--mx-border);border-bottom:none;border-radius:12px 12px 0 0;
+  padding:8px 14px;font-size:12.5px;font-weight:600;letter-spacing:1px;margin-top:14px;
+  font-family:var(--mono);text-shadow:0 0 7px rgba(0,255,65,.55);
+}
+.out{
+  background:rgba(0,6,0,.92);color:var(--mx-green);border:1px solid var(--mx-border);
+  border-top:none;border-radius:0 0 12px 12px;font-family:var(--mono);font-size:13px;
+  padding:14px;min-height:70px;white-space:pre-wrap;line-height:1.5;
+  text-shadow:0 0 6px rgba(0,255,65,.4);box-shadow:inset 0 0 22px rgba(0,255,65,.1);
+}
+.out-err{color:#ff5b5b;text-shadow:0 0 6px rgba(255,60,60,.5);}
+.out-ok{color:#4dff7a;text-shadow:0 0 7px rgba(0,255,90,.55);}
+.out-explain{
+  margin-top:10px;background:rgba(245,158,11,.12);border-left:3px solid var(--orange);
+  border-radius:8px;padding:10px 12px;color:#ffe2b8;font-family:var(--prose);font-size:13px;line-height:1.55;
+}
+.out-explain b{color:var(--gold);}
+
+/* LEARN-ON-SUCCESS (reward modal) */
+.rw-explain{
+  margin-top:12px;background:rgba(245,158,11,.12);border-left:3px solid var(--orange);
+  border-radius:8px;padding:11px 13px;color:#ffe2b8;font-size:13px;line-height:1.6;text-align:left;
+}
+.rwx-h{display:block;color:var(--gold);font-weight:700;margin-bottom:5px;}
+.rw-explain code{background:rgba(0,0,0,.35);padding:1px 6px;border-radius:5px;font-family:var(--mono);font-size:12px;color:#9fe;}
+.rw-explain b{color:var(--gold);}
+
+/* MODALS */
+.overlay{
+  position:fixed;inset:0;background:rgba(8,12,24,.74);backdrop-filter:blur(3px);
+  display:none;align-items:center;justify-content:center;z-index:50;padding:20px;
+}
+.overlay.show{display:flex;animation:fade .25s;}
+.modal{
+  background:linear-gradient(160deg,#1b2238,#222c49);border:1px solid rgba(245,197,66,.35);
+  border-radius:20px;max-width:560px;width:100%;padding:26px;color:#eef2f8;
+  box-shadow:0 30px 80px rgba(0,0,0,.6);max-height:88vh;overflow:auto;
+}
+.modal h2{color:#fff;font-size:21px;margin-bottom:8px;display:flex;align-items:center;gap:10px;}
+.modal .lore{
+  background:linear-gradient(120deg, rgba(122,92,240,.18), rgba(0,167,157,.12));
+  border-left:3px solid var(--gold);border-radius:10px;padding:12px 14px;
+  font-size:13.5px;line-height:1.6;color:#e9e2ff;margin:12px 0;
+}
+.stars-big{font-size:34px;letter-spacing:6px;color:var(--gold);text-align:center;margin:6px 0 4px;}
+.modal .x{float:right;cursor:pointer;font-size:20px;color:#9fb0cc;background:none;border:none;}
+.read-list{display:flex;flex-direction:column;gap:12px;margin-top:14px;}
+.read-card{
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.14);
+  border-radius:14px;padding:14px 16px;cursor:pointer;transition:transform .12s,border-color .12s;
+}
+.read-card:hover{transform:translateY(-2px);border-color:var(--teal);}
+.read-card .rc-t{font-weight:700;color:#fff;font-size:15px;display:flex;align-items:center;gap:9px;}
+.read-card .rc-s{font-size:11.5px;color:#9fb0cc;margin:3px 0 0 31px;}
+.article-body{font-size:14px;line-height:1.7;color:#e3eaf6;}
+.article-body p{margin:10px 0;}
+.article-body h4{color:var(--teal);margin:14px 0 4px;font-size:15px;}
+.article-body ul{margin:8px 0 8px 20px;}
+.article-body li{margin:5px 0;}
+.article-body .why{
+  margin-top:14px;background:rgba(0,167,157,.12);border-left:3px solid var(--teal);
+  border-radius:8px;padding:11px 13px;font-size:13px;color:#cdeee9;
+}
+.forced-banner{
+  background:linear-gradient(120deg,rgba(220,38,38,.22),rgba(245,158,11,.18));
+  border:1px solid rgba(245,158,11,.4);border-radius:10px;padding:10px 13px;
+  font-size:13px;color:#ffe2b8;margin-bottom:6px;line-height:1.5;
+}
+
+/* BADGES */
+.badges{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px;}
+.badge{
+  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);
+  border-radius:12px;padding:9px 12px;font-size:12px;color:#9fb0cc;
+  display:flex;align-items:center;gap:8px;opacity:.5;
+}
+.badge.earned{opacity:1;border-color:var(--gold);color:#fff;background:rgba(245,197,66,.12);}
+.badge .bi{font-size:18px;}
+
+/* TOAST + CONFETTI */
+.toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(120px);
+  background:linear-gradient(135deg,var(--teal),var(--blue));color:#fff;
+  padding:13px 22px;border-radius:12px;font-size:14px;font-weight:600;
+  box-shadow:0 12px 30px rgba(0,0,0,.4);z-index:60;transition:transform .4s;
+}
+.toast.show{transform:translateX(-50%) translateY(0);}
+.confetti{position:fixed;width:10px;height:14px;top:-20px;z-index:55;pointer-events:none;border-radius:2px;}
+
+.foot-note{margin-top:30px;text-align:center;font-size:12px;color:#8090ab;line-height:1.6;}
+.loading{text-align:center;padding:50px 20px;color:#cdd7ea;font-size:15px;}
+.spin{
+  width:42px;height:42px;border:4px solid rgba(255,255,255,.2);border-top-color:var(--teal);
+  border-radius:50%;margin:0 auto 16px;animation:rot 1s linear infinite;
+}
+@keyframes rot{to{transform:rotate(360deg);}}
+
+/* MOBILE (phones - Android & iOS) */
+@media(max-width:640px){
+  .wrap{padding:14px 12px 48px;}
+  .top{padding:13px 14px;gap:12px;border-radius:14px;}
+  .logo{width:44px;height:44px;font-size:22px;}
+  .title-h h1{font-size:19px;}
+  .title-h .sub{font-size:11.5px;}
+  .hud{gap:7px;width:100%;}
+  .chip{padding:6px 10px;font-size:12px;}
+  .saga{font-size:12.5px;padding:12px 14px;}
+  .worlds{grid-template-columns:1fr;gap:13px;}
+  .grid{grid-template-columns:repeat(auto-fill,minmax(52px,1fr));gap:8px;}
+  .node{font-size:14px;border-radius:10px;}
+  .chal{grid-template-columns:1fr;gap:14px;}
+  .panel{padding:15px;}
+  .story{font-size:14px;}
+  .task{font-size:15.5px;}
+  .btn{padding:12px 15px;font-size:14px;min-height:46px;}
+  .btn-row{gap:8px;}
+  .section-h{flex-wrap:wrap;gap:8px;}
+  .section-h h2{font-size:16px;}
+  textarea.code{font-size:16px;min-height:200px;}  /* 16px stops iOS auto-zoom on focus */
+  .att-meter{flex-wrap:wrap;gap:8px;padding:8px 11px;}
+  .att-meter .att-count{margin-left:0;}
+  .anime-bg{opacity:.4;}
+  .modal{padding:18px;max-height:90vh;}
+  .modal h2{font-size:18px;}
+  .stars-big{font-size:28px;letter-spacing:4px;}
+  .hero{padding:10px 8px 12px;}
+  .hero-tag{font-size:12px;}
+}
+@media(max-width:380px){
+  .grid{grid-template-columns:repeat(auto-fill,minmax(46px,1fr));}
+  .title-h h1{font-size:17px;}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <div class="logo">🐍</div>
+    <div class="title-h">
+      <h1>Python Quest</h1>
+      <div class="sub">Unilever Data Foundations - learn Python by restoring a broken data realm</div>
+    </div>
+    <div class="spacer"></div>
+    <div class="hud">
+      <div class="chip">🔖 <b>v2.1</b></div>
+      <div class="chip">⭐ <b id="hud-stars">0</b></div>
+      <div class="chip">⚡ <b id="hud-xp">0</b> XP</div>
+      <div class="chip">🗺️ <b id="hud-done">0</b>/1000</div>
+      <div class="chip">🏅 <b id="hud-badges">0</b></div>
+    </div>
+  </div>
+
+  <div class="saga">
+    <b>The Saga.</b> You are a <b>Data Pathfinder</b>. The realm's data pipelines have shattered into 20 broken regions. Each puzzle you solve with Python repairs one node and reveals a fragment of the story. Clear a region's Gatekeeper to unlock the next. Restore all 1000 nodes to bring the realm back online.
+  </div>
+
+  <!-- HERO BANNER -->
+  <div class="hero">
+    <svg class="hero-svg" viewBox="0 0 760 230" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Python Quest mascot">
+      <defs>
+        <radialGradient id="hgGlow" cx="50%" cy="40%" r="70%">
+          <stop offset="0%" stop-color="#FFD23F" stop-opacity=".35"/>
+          <stop offset="100%" stop-color="#E63946" stop-opacity="0"/>
+        </radialGradient>
+        <linearGradient id="hgSnake" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#FFB020"/>
+          <stop offset="100%" stop-color="#E63946"/>
+        </linearGradient>
+        <linearGradient id="hgFlame" x1="0" y1="1" x2="0" y2="0">
+          <stop offset="0%" stop-color="#FF5630"/>
+          <stop offset="55%" stop-color="#FFB020"/>
+          <stop offset="100%" stop-color="#FFD23F"/>
+        </linearGradient>
+        <linearGradient id="hgNode" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#7a3cf0"/>
+          <stop offset="100%" stop-color="#E63946"/>
+        </linearGradient>
+      </defs>
+      <!-- backdrop glow -->
+      <ellipse cx="380" cy="120" rx="360" ry="120" fill="url(#hgGlow)"/>
+      <!-- twinkles -->
+      <g fill="#FFD23F" opacity=".85">
+        <circle cx="120" cy="40" r="3"><animate attributeName="opacity" values=".2;1;.2" dur="2.4s" repeatCount="indefinite"/></circle>
+        <circle cx="650" cy="55" r="2.5"><animate attributeName="opacity" values="1;.2;1" dur="2.8s" repeatCount="indefinite"/></circle>
+        <circle cx="700" cy="150" r="3"><animate attributeName="opacity" values=".3;1;.3" dur="3.1s" repeatCount="indefinite"/></circle>
+        <circle cx="70" cy="160" r="2.5"><animate attributeName="opacity" values="1;.3;1" dur="2.2s" repeatCount="indefinite"/></circle>
+      </g>
+      <!-- floating data nodes (broken realm) -->
+      <g stroke="#FFD23F" stroke-width="2" opacity=".55">
+        <line x1="560" y1="95" x2="635" y2="70"/>
+        <line x1="635" y1="70" x2="660" y2="140"/>
+        <line x1="560" y1="95" x2="610" y2="150"/>
+      </g>
+      <g>
+        <rect x="545" y="80" width="30" height="30" rx="7" fill="url(#hgNode)"/>
+        <rect x="620" y="55" width="30" height="30" rx="7" fill="url(#hgNode)"/>
+        <rect x="645" y="125" width="30" height="30" rx="7" fill="url(#hgNode)"/>
+        <rect x="595" y="135" width="30" height="30" rx="7" fill="url(#hgNode)"/>
+        <text x="560" y="101" font-size="16" text-anchor="middle" fill="#fff">{ }</text>
+        <text x="635" y="76" font-size="15" text-anchor="middle" fill="#fff">&gt;_</text>
+      </g>
+      <!-- torch in left hand -->
+      <g>
+        <rect x="150" y="120" width="10" height="60" rx="4" fill="#7a3cf0"/>
+        <path d="M155 70 C140 92 142 110 155 118 C168 110 170 92 155 70 Z" fill="url(#hgFlame)">
+          <animateTransform attributeName="transform" type="scale" values="1 1;1.05 0.96;1 1" additive="sum" dur="1.1s" repeatCount="indefinite"/>
+        </path>
+        <path d="M155 86 C148 98 149 108 155 113 C161 108 162 98 155 86 Z" fill="#FFF4CC"/>
+      </g>
+      <!-- snake mascot (child-friendly) -->
+      <g>
+        <!-- coiled body -->
+        <path d="M210 200 C210 150 270 150 270 175 C270 198 235 198 240 172 C245 150 300 152 300 185"
+              fill="none" stroke="url(#hgSnake)" stroke-width="26" stroke-linecap="round"/>
+        <!-- head -->
+        <circle cx="320" cy="135" r="46" fill="url(#hgSnake)"/>
+        <!-- belly -->
+        <ellipse cx="320" cy="150" rx="30" ry="20" fill="#FFE08A" opacity=".8"/>
+        <!-- eyes -->
+        <circle cx="305" cy="125" r="11" fill="#fff"/>
+        <circle cx="338" cy="125" r="11" fill="#fff"/>
+        <circle cx="307" cy="127" r="5.5" fill="#160d14"/>
+        <circle cx="340" cy="127" r="5.5" fill="#160d14"/>
+        <circle cx="309" cy="124" r="2" fill="#fff"/>
+        <circle cx="342" cy="124" r="2" fill="#fff"/>
+        <!-- smile -->
+        <path d="M306 150 Q321 165 336 150" fill="none" stroke="#160d14" stroke-width="3.5" stroke-linecap="round"/>
+        <!-- tongue -->
+        <path d="M321 162 q0 12 -6 18 m6 -18 q0 12 6 18" fill="none" stroke="#E63946" stroke-width="3" stroke-linecap="round"/>
+        <!-- cheeks -->
+        <circle cx="292" cy="143" r="6" fill="#FF5630" opacity=".5"/>
+        <circle cx="350" cy="143" r="6" fill="#FF5630" opacity=".5"/>
+      </g>
+      <!-- title text -->
+      <text x="430" y="120" font-family="Segoe UI, sans-serif" font-size="40" font-weight="800" fill="#fff">Python</text>
+      <text x="430" y="165" font-family="Segoe UI, sans-serif" font-size="40" font-weight="800" fill="#FFD23F">Quest</text>
+    </svg>
+    <div class="hero-tag">Light the torch. Restore the realm. Learn Python one riddle at a time.</div>
+  </div>
+
+  <!-- WORLDS SCREEN -->
+  <div id="worldsScreen" class="screen active">
+    <div class="section-h"><h2>🌍 Regions of the Realm</h2><span class="crumb">Choose a region to begin</span></div>
+    <div id="worlds" class="worlds"></div>
+    <div class="section-h" style="margin-top:26px;"><h2>🏅 Badges</h2></div>
+    <div id="badges" class="badges"></div>
+  </div>
+
+  <!-- LEVELS SCREEN -->
+  <div id="levelsScreen" class="screen">
+    <div class="section-h">
+      <button class="btn-back" onclick="showWorlds()">← Regions</button>
+      <h2 id="lv-world">Region</h2>
+      <span class="crumb" id="lv-crumb"></span>
+    </div>
+    <div id="grid" class="grid"></div>
+  </div>
+
+  <!-- CHALLENGE SCREEN -->
+  <div id="challengeScreen" class="screen">
+    <div class="anime-bg" id="animeBg"></div>
+    <div class="section-h">
+      <button class="btn-back" id="back-to-grid">← Region map</button>
+      <h2 id="ch-title">Challenge</h2>
+      <span class="crumb" id="ch-crumb"></span>
+    </div>
+    <div class="chal">
+      <div class="panel">
+        <div class="quest-head"><h3>📜 The Quest</h3><div class="sprite" id="ch-sprite"></div></div>
+        <div class="story" id="ch-story"></div>
+        <div class="task" id="ch-task"></div>
+        <div class="hints" id="ch-hints"></div>
+        <div class="btn-row">
+          <button class="btn btn-ghost" id="btn-hint">💡 Hint</button>
+          <button class="btn btn-ghost" id="btn-learn">📚 Learning break</button>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="editor-head">
+          <span>🐍 your_solution.py</span>
+          <span class="dots"><i style="background:#ff5f56"></i><i style="background:#ffbd2e"></i><i style="background:#27c93f"></i></span>
+        </div>
+        <div class="code-wrap"><div class="code-rain"></div><textarea class="code" id="code" spellcheck="false"></textarea></div>
+        <div class="btn-row">
+          <button class="btn btn-teal" id="btn-run">▶ Run (Ctrl+Enter)</button>
+          <button class="btn btn-gold" id="btn-check">✓ Check answer</button>
+        </div>
+        <div class="att-meter" id="attMeter">
+          <span class="att-label">Attempts</span>
+          <span class="att-dots" id="attDots"></span>
+          <span class="att-hint" id="attHint">5 misses triggers a learning break</span>
+          <span class="att-count" id="attCount">0 / 5</span>
+        </div>
+        <div class="out-head">▣ Output</div>
+        <div class="out" id="out">Run your code to see the output here.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot-note">
+    Powered by Pyodide (Python in your browser) - everything runs locally on your machine, no data leaves your laptop.<br>
+    Built for the Unilever Data Foundations community. British English throughout.
+  </div>
+</div>
+
+<!-- REWARD MODAL -->
+<div class="overlay" id="rewardOverlay">
+  <div class="modal">
+    <h2 id="rw-title">🎉 Node restored!</h2>
+    <div class="stars-big" id="rw-stars">★ ★ ★</div>
+    <div class="lore" id="rw-lore"></div>
+    <div class="rw-explain" id="rw-explain"></div>
+    <div id="rw-badge" style="font-size:13.5px;color:var(--gold);text-align:center;margin:6px 0;"></div>
+    <div class="btn-row" style="justify-content:center;margin-top:14px;">
+      <button class="btn btn-ghost" id="rw-stay">Stay here</button>
+      <button class="btn btn-teal" id="rw-next">Next node →</button>
+    </div>
+  </div>
+</div>
+
+<!-- BREAK / READING MODAL -->
+<div class="overlay" id="breakOverlay">
+  <div class="modal">
+    <button class="x" id="break-x">✕</button>
+    <h2 id="break-title">📚 Learning break</h2>
+    <div id="break-banner"></div>
+    <div id="break-intro" style="font-size:13.5px;color:#cdd7ea;line-height:1.6;">
+      A short read can unlock the idea you need. Pick one:
+    </div>
+    <div class="read-list" id="readList"></div>
+    <div id="articleView" style="display:none;">
+      <button class="btn btn-ghost" id="art-back" style="margin-bottom:12px;">← Back to list</button>
+      <div class="article-body" id="articleBody"></div>
+      <div class="btn-row" style="margin-top:16px;">
+        <button class="btn btn-teal" id="art-done">✓ I've read this</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+<script>
+/* ============================================================
+   PYTHON QUEST v5  -  procedural 1000-level generator
+   Generator block (helpers + context + ARCH + build loop) is
+   DOM-free so it can be copied verbatim into the QA harness.
+   ============================================================ */
+
+/* ---------- helpers ---------- */
+const norm = s => s.replace(/\r/g,"").replace(/[ \t]+$/gm,"").trim();
+const escHtml = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+function rng(seed){ let s=seed>>>0; return ()=>{ s=(s*1664525+1013904223)>>>0; return s/4294967296; }; }
+function ri(r,a,b){ return a+Math.floor(r()*(b-a+1)); }
+function pick(r,arr){ return arr[Math.floor(r()*arr.length)]; }
+function pickN(r,arr,n){ const c=arr.slice(),out=[]; for(let j=0;j<n&&c.length;j++){ out.push(c.splice(Math.floor(r()*c.length),1)[0]); } return out; }
+const cap = s => s ? s.charAt(0).toUpperCase()+s.slice(1) : s;
+const pyList = a => '['+a.join(', ')+']';
+function numList(r,k,a,b){ const o=[]; for(let j=0;j<k;j++) o.push(ri(r,a,b)); return o; }
+function distinct(r,k,a,b){ const set=new Set(); let guard=0; while(set.size<k && guard++<400){ set.add(ri(r,a,b)); } return [...set]; }
+
+/* ---------- context ---------- */
+const PLAT=["Databricks","Snowflake","Synapse","Fabric","BigQuery","Redshift","Kafka","Postgres"];
+const PIPE=["sales","finance","supply","hr","marketing","logistics","retail","ops","quality","planning"];
+const WORLD_NAMES=[
+ "First Steps","Number Forge","Variable Vale","String Shores","Logic Hollow","Loop Lagoon","List Lands","Branch Bay",
+ "Dict Delta","Filter Fells","Compre Canyon","Sort Springs","Function Fjord","Lambda Lake","Aggregate Acres","Pipeline Peaks",
+ "Recursion Ridge","Sequence Sands","Insight Isles","Grand Summit"
+];
+const WORLD_ICO=["👣","🔢","📦","🧵","🧭","🌀","📋","🌿","🗂️","🏔️","🏜️","💧","⛵","🪞","🌾","⛰️","🪜","🏖️","🏝️","👑"];
+
+/* ---------- archetypes ----------
+   each fn(r,w) returns {title,story,task,expected,starter,hints[],solution,lore}
+   expected is a String (what Python print() emits, before norm)
+*/
+const ARCH={ basic:[], inter:[], adv:[] };
+
+/* ----- BASIC ----- */
+ARCH.basic.push((r,w)=>{ // 1 exact greeting
+  const pl=pick(r,PIPE), plat=pick(r,PLAT);
+  const msg=`${cap(pl)} pipeline online at ${plat}`;
+  return {
+    title:"The First Beacon",
+    story:`A dormant node guards the gateway. To wake the ${cap(pl)} pipeline on ${plat}, the old console demands its activation phrase spoken back exactly - not a letter more, not a letter less.`,
+    task:`Speak the phrase to the console, on a single line, word for word:<br><code>${msg}</code>`,
+    expected:msg,
+    starter:`# Light the beacon\n`,
+    hints:["Words can only be spoken aloud once wrapped in quotation marks.",`The console accepts: print("${msg}")`],
+    solution:`print("${msg}")`,
+    lore:`The beacon flares to life. "${msg}" echoes across the valley. The realm has heard you.`,
+    explain:`<code>print(...)</code> sends whatever sits inside the brackets to the screen. The text is wrapped in quotation marks so Python treats it as fixed text and prints it exactly, character for character.`
+  };
+});
+ARCH.basic.push((r,w)=>{ // 2 add two vars
+  const a=ri(r,20,90), b=ri(r,20,90), p1=pick(r,PIPE), p2=pick(r,PIPE);
+  return {
+    title:"Two Streams, One Flow",
+    story:`Two tributaries feed the lake: the ${p1} stream carries ${a} records, the ${p2} stream carries ${b}. The lake rises to whatever the two together become.`,
+    task:`Hold each stream in a variable, then reveal the single number formed when both meet.`,
+    expected:String(a+b),
+    starter:`a = ${a}\nb = ${b}\n# print the sum\n`,
+    hints:["Two numbers join into one with a single arithmetic sign.","print(a + b)"],
+    solution:`a = ${a}\nb = ${b}\nprint(a + b)`,
+    lore:`The ledger reads ${a+b}. Both streams now flow as one channel.`,
+    explain:`Each value sits in a named variable. <code>+</code> adds the two numbers and <code>print(...)</code> shows the single result.`
+  };
+});
+ARCH.basic.push((r,w)=>{ // 3 subtract
+  const total=ri(r,120,300), rej=ri(r,5,90);
+  return {
+    title:"The Cleansing Gate",
+    story:`A batch of ${total} records reaches the cleansing gate. ${rej} are corrupted and crumble to dust at the threshold. Only the survivors walk on.`,
+    task:`Reveal how many records pass through the gate clean.`,
+    expected:String(total-rej),
+    starter:`total = ${total}\nrejected = ${rej}\n# print the clean count\n`,
+    hints:["What remains is found by taking the lost away from the whole.","print(total - rejected)"],
+    solution:`total = ${total}\nrejected = ${rej}\nprint(total - rejected)`,
+    lore:`${total-rej} clean records glide through the gate. The corruption is purged.`,
+    explain:`<code>-</code> removes the rejected count from the total, leaving the survivors, which <code>print(...)</code> displays.`
+  };
+});
+ARCH.basic.push((r,w)=>{ // 4 multiply
+  const b=ri(r,3,12), per=ri(r,8,40);
+  return {
+    title:"The Multiplying Mill",
+    story:`The mill turns ${b} times, and each turn presses ${per} units of grain. The keeper wants the harvest counted in full.`,
+    task:`Reveal the grand total the mill produces across all its turns.`,
+    expected:String(b*per),
+    starter:`batches = ${b}\nper_batch = ${per}\n# print the total\n`,
+    hints:["Repeated addition of the same number has a shorter sign.","print(batches * per_batch)"],
+    solution:`batches = ${b}\nper_batch = ${per}\nprint(batches * per_batch)`,
+    lore:`The mill yields ${b*per} units. Its gears settle into a steady hum.`,
+    explain:`<code>*</code> multiplies the two numbers (repeated addition in one step); <code>batches * per_batch</code> is the grand total.`
+  };
+});
+ARCH.basic.push((r,w)=>{ // 5 f-string
+  const pl=pick(r,PIPE), rows=ri(r,100,9000);
+  const exp=`${pl} has ${rows} rows`;
+  return {
+    title:"Scroll of Names",
+    story:`The archive scribe inscribes one line for the ${pl} table, weaving its name together with its tally of ${rows} rows.`,
+    task:`Inscribe this exact line, the name and the number woven into one sentence:<br><code>${exp}</code>`,
+    expected:exp,
+    starter:`name = "${pl}"\nrows = ${rows}\n# print using an f-string\n`,
+    hints:["A formatted string lets you drop variables straight inside the text.",`print(f"{name} has {rows} rows")`],
+    solution:`name = "${pl}"\nrows = ${rows}\nprint(f"{name} has {rows} rows")`,
+    lore:`The scroll glows: "${exp}". The archive accepts the entry.`,
+    explain:`An f-string (the <code>f</code> before the quotes) drops a variable into text by wrapping its name in <code>{ }</code>; Python swaps each placeholder for its value.`
+  };
+});
+ARCH.basic.push((r,w)=>{ // 6 len of list
+  const k=ri(r,3,6), plats=pickN(r,PLAT,k);
+  const lit='['+plats.map(p=>`"${p}"`).join(', ')+']';
+  return {
+    title:"Counting the Towers",
+    story:`The map shows a row of platform towers: ${plats.join(", ")}. The cartographer must record exactly how many stand.`,
+    task:`Reveal the number of towers standing on the map.`,
+    expected:String(k),
+    starter:`platforms = ${lit}\n# print how many\n`,
+    hints:["There is a built-in way to measure how many items a list holds.","print(len(platforms))"],
+    solution:`platforms = ${lit}\nprint(len(platforms))`,
+    lore:`${k} towers counted and marked on the map. None forgotten.`,
+    explain:`<code>len(...)</code> counts how many items a list holds, returning the number of towers.`
+  };
+});
+ARCH.basic.push((r,w)=>{ // 7 sum
+  const k=ri(r,4,6), loads=numList(r,k,10,99);
+  return {
+    title:"The Toll of Loads",
+    story:`The day's loads arrive at the toll bridge: ${loads.join(", ")}. The keeper may not let a single cart pass until every weight is gathered into one toll.`,
+    task:`Reveal the single total formed when every load is gathered together.`,
+    expected:String(loads.reduce((a,b)=>a+b,0)),
+    starter:`loads = ${pyList(loads)}\n# print the total\n`,
+    hints:["There is a built-in way to add every number in a list at once.","print(sum(loads))"],
+    solution:`loads = ${pyList(loads)}\nprint(sum(loads))`,
+    lore:`The toll totals ${loads.reduce((a,b)=>a+b,0)}. The ledger balances.`,
+    explain:`<code>sum(...)</code> walks the whole list and adds every number in one step.`
+  };
+});
+ARCH.basic.push((r,w)=>{ // 8 even / odd
+  const n=ri(r,2,99), exp = n%2===0?"even":"odd";
+  return {
+    title:"The Twin Doors",
+    story:`Two doors face you in the dark. The left opens only for an even count, the right only for an odd one. Tonight the tally on the wall reads ${n}.`,
+    task:`Name the door that opens tonight: speak <code>even</code> or <code>odd</code> to match the tally.`,
+    expected:exp,
+    starter:`n = ${n}\n# print "even" or "odd"\n`,
+    hints:["The remainder after dividing by two tells you which door it is.",`if n % 2 == 0:\n    print("even")\nelse:\n    print("odd")`],
+    solution:`n = ${n}\nif n % 2 == 0:\n    print("even")\nelse:\n    print("odd")`,
+    lore:`The ${exp} door swings open. You step through into the next chamber.`,
+    explain:`<code>n % 2</code> is the remainder after dividing by two; <code>0</code> means even, otherwise odd, and the <code>if/else</code> picks the word.`
+  };
+});
+
+/* ----- INTERMEDIATE ----- */
+ARCH.inter.push((r,w)=>{ // 1 max
+  const k=ri(r,4,6), v=distinct(r,k,50,500);
+  return {
+    title:"The Highest Peak",
+    story:`From the valley the throughput beacons flare in turn: ${v.join(", ")}. The watchtower keeper scans them all for the one that burns brightest.`,
+    task:`Reveal the single greatest reading among the beacons.`,
+    expected:String(Math.max(...v)),
+    starter:`throughput = ${pyList(v)}\n# print the highest\n`,
+    hints:["A built-in can hand you the largest item of a list directly.","print(max(throughput))"],
+    solution:`throughput = ${pyList(v)}\nprint(max(throughput))`,
+    lore:`The peak stands at ${Math.max(...v)}. From here you can see the whole region.`,
+    explain:`<code>max(...)</code> scans the list and returns the single largest value.`
+  };
+});
+ARCH.inter.push((r,w)=>{ // 2 min
+  const k=ri(r,4,6), v=distinct(r,k,20,400);
+  return {
+    title:"The Lowest Well",
+    story:`Deep in the well, latency echoes return as numbers: ${v.join(", ")}. The swiftest current is the one that echoes back the smallest.`,
+    task:`Reveal the single smallest reading drawn from the well.`,
+    expected:String(Math.min(...v)),
+    starter:`latency = ${pyList(v)}\n# print the lowest\n`,
+    hints:["A built-in can hand you the smallest item of a list directly.","print(min(latency))"],
+    solution:`latency = ${pyList(v)}\nprint(min(latency))`,
+    lore:`The well bottoms out at ${Math.min(...v)}. The cleanest current runs here.`,
+    explain:`<code>min(...)</code> scans the list and returns the single smallest value.`
+  };
+});
+ARCH.inter.push((r,w)=>{ // 3 dict access
+  const pl=pick(r,PIPE), statuses=["healthy","degraded","stalled","recovering"], st=pick(r,statuses), rows=ri(r,100,5000);
+  return {
+    title:"The Status Stone",
+    story:`A glowing stone keeps the ${pl} pipeline's record sealed in labelled compartments. One drawer is marked <code>status</code>, and only its contents will tell you the pipeline's true condition.`,
+    task:`Open the drawer marked <code>"status"</code> and reveal what rests inside.`,
+    expected:st,
+    starter:`pipeline = {"name": "${pl}", "status": "${st}", "rows": ${rows}}\n# print the status\n`,
+    hints:["A labelled compartment is opened with square brackets around its label.",`print(pipeline["status"])`],
+    solution:`pipeline = {"name": "${pl}", "status": "${st}", "rows": ${rows}}\nprint(pipeline["status"])`,
+    lore:`The stone reveals: ${st}. Now you know the pipeline's true condition.`,
+    explain:`A dictionary stores values under keys; <code>pipeline["status"]</code> opens the drawer labelled <code>status</code> and returns its contents.`
+  };
+});
+ARCH.inter.push((r,w)=>{ // 4 filter comprehension
+  const k=ri(r,5,7), sizes=numList(r,k,100,1000), t=ri(r,300,700);
+  const filtered=sizes.filter(x=>x>t);
+  return {
+    title:"The Sieve of Giants",
+    story:`Partition sizes tumble onto the sieve: ${sizes.join(", ")}. The mesh is set to ${t} - only the giants larger than that are caught, the rest fall through and are lost.`,
+    task:`Reveal the list of every size the sieve catches above <code>${t}</code>, kept in the order they arrived.`,
+    expected:pyList(filtered),
+    starter:`sizes = ${pyList(sizes)}\nt = ${t}\n# print the filtered list\n`,
+    hints:["You can build a new list in one line by walking the old one and keeping only what passes a test.","print([s for s in sizes if s > t])"],
+    solution:`sizes = ${pyList(sizes)}\nt = ${t}\nprint([s for s in sizes if s > t])`,
+    lore:`The sieve holds ${pyList(filtered)}. Only the giants remain.`,
+    explain:`A list comprehension builds a new list in one line: <code>for s in sizes</code> walks each value and <code>if s > t</code> keeps only those above the threshold, preserving order.`
+  };
+});
+ARCH.inter.push((r,w)=>{ // 5 if/elif classify
+  const load=ri(r,100,2200);
+  const exp = load>1500?"heavy":(load>800?"medium":"light");
+  return {
+    title:"Weigh the Load",
+    story:`A cart of ${load} units rolls onto the weighbridge. The gatekeeper's law is carved in stone: above 1500 it is named <code>heavy</code>, above 800 it is <code>medium</code>, and anything lighter is simply <code>light</code>.`,
+    task:`Weigh the cart against the law and speak the one name it earns.`,
+    expected:exp,
+    starter:`load = ${load}\n# classify and print\n`,
+    hints:["Test the heaviest band first, then the next, then let everything else fall to the last.",`if load > 1500:\n    print("heavy")\nelif load > 800:\n    print("medium")\nelse:\n    print("light")`],
+    solution:`load = ${load}\nif load > 1500:\n    print("heavy")\nelif load > 800:\n    print("medium")\nelse:\n    print("light")`,
+    lore:`The scales settle on ${exp}. The load is logged correctly.`,
+    explain:`The <code>if/elif/else</code> chain tests bands from highest to lowest; the first true test wins, so <code>&gt; 1500</code> is checked before <code>&gt; 800</code>.`
+  };
+});
+ARCH.inter.push((r,w)=>{ // 6 count above threshold
+  const k=ri(r,5,7), loads=numList(r,k,50,900), t=ri(r,200,600);
+  const cnt=loads.filter(x=>x>t).length;
+  return {
+    title:"The Tally Keeper",
+    story:`The run sizes file past the tally keeper one by one: ${loads.join(", ")}. The keeper's only duty is to mark how many dared cross the limit of ${t}.`,
+    task:`Reveal how many of the runs stand greater than <code>${t}</code>.`,
+    expected:String(cnt),
+    starter:`loads = ${pyList(loads)}\nt = ${t}\n# print the count above t\n`,
+    hints:["Gather the ones that pass the test into a new list, then measure how long it is.","print(len([x for x in loads if x > t]))"],
+    solution:`loads = ${pyList(loads)}\nt = ${t}\nprint(len([x for x in loads if x > t]))`,
+    lore:`${cnt} runs crossed the line. The tally is etched into the keeper's stone.`,
+    explain:`<code>[x for x in loads if x &gt; t]</code> collects only values above the limit, then <code>len(...)</code> counts them.`
+  };
+});
+ARCH.inter.push((r,w)=>{ // 7 integer average
+  const k=ri(r,4,6), loads=numList(r,k,40,400);
+  const avg=Math.floor(loads.reduce((a,b)=>a+b,0)/loads.length);
+  return {
+    title:"The Balanced Mean",
+    story:`The throughput of ${loads.length} days lies before the council: ${loads.join(", ")}. They want one fair number to stand for them all - the balance point, with any fraction shaved away.`,
+    task:`Reveal the whole-number average of the days, the remainder discarded.`,
+    expected:String(avg),
+    starter:`loads = ${pyList(loads)}\n# print the integer average\n`,
+    hints:["Gather the total, share it across the count, and divide in a way that keeps only the whole part.","print(sum(loads) // len(loads))"],
+    solution:`loads = ${pyList(loads)}\nprint(sum(loads) // len(loads))`,
+    lore:`The mean rests at ${avg}. The council nods in agreement.`,
+    explain:`<code>sum(...)</code> totals and <code>len(...)</code> counts; <code>//</code> divides keeping only the whole part, giving an integer average.`
+  };
+});
+ARCH.inter.push((r,w)=>{ // 8 sorted asc
+  const k=ri(r,4,6), loads=distinct(r,k,10,300);
+  const srt=loads.slice().sort((a,b)=>a-b);
+  return {
+    title:"Order from Chaos",
+    story:`Shards of the broken ledger lie scattered across the floor in no order: ${loads.join(", ")}. The realm will only accept them once they lie in a rising line, smallest first.`,
+    task:`Reveal the shards arranged in a single rising line, from smallest to largest.`,
+    expected:pyList(srt),
+    starter:`loads = ${pyList(loads)}\n# print the sorted list\n`,
+    hints:["A built-in can hand back a fresh, ordered copy of a list without disturbing the original.","print(sorted(loads))"],
+    solution:`loads = ${pyList(loads)}\nprint(sorted(loads))`,
+    lore:`The shards align: ${pyList(srt)}. Order is restored to the field.`,
+    explain:`<code>sorted(...)</code> returns a fresh copy ordered smallest to largest, leaving the original untouched.`
+  };
+});
+
+/* ----- ADVANCED ----- */
+function dictBlock(names,rows){
+  let s='pipelines = [\n';
+  for(let j=0;j<names.length;j++) s+=`    {"name": "${names[j]}", "rows": ${rows[j]}},\n`;
+  s+=']';
+  return s;
+}
+ARCH.adv.push((r,w)=>{ // 1 max-by-key name
+  const k=ri(r,3,4), names=pickN(r,PIPE,k), rows=distinct(r,k,500,5000);
+  let bi=0; for(let j=1;j<rows.length;j++) if(rows[j]>rows[bi]) bi=j;
+  return {
+    title:"The Heaviest Crown",
+    story:`Several pipelines gather in the throne room, each bearing its weight in rows. The crown is not won by the loudest name but by the one carrying the heaviest load.`,
+    task:`Reveal the <code>name</code> of the pipeline whose <code>rows</code> outweigh every rival.`,
+    expected:names[bi],
+    starter:`${dictBlock(names,rows)}\n# print the name with the most rows\n`,
+    hints:["You can ask for the greatest record by telling the search which field to weigh.",`print(max(pipelines, key=lambda p: p["rows"])["name"])`],
+    solution:`${dictBlock(names,rows)}\nprint(max(pipelines, key=lambda p: p["rows"])["name"])`,
+    lore:`The crown settles on ${names[bi]}. Its ${rows[bi]} rows outweigh all rivals.`,
+    explain:`<code>max(..., key=lambda p: p["rows"])</code> compares records by their <code>rows</code> field; <code>["name"]</code> then reads the winner's name.`
+  };
+});
+ARCH.adv.push((r,w)=>{ // 2 sum of rows
+  const k=ri(r,3,4), names=pickN(r,PIPE,k), rows=numList(r,k,200,3000);
+  const tot=rows.reduce((a,b)=>a+b,0);
+  return {
+    title:"The Grand Ledger",
+    story:`The treasury cannot rest until every pipeline in the vault has surrendered its weight in rows to a single grand ledger.`,
+    task:`Reveal the single total formed when every pipeline's <code>rows</code> are gathered into one sum.`,
+    expected:String(tot),
+    starter:`${dictBlock(names,rows)}\n# print the total rows\n`,
+    hints:["Walk every record, pluck out the one field you care about, and add them as you go.","print(sum(p['rows'] for p in pipelines))"],
+    solution:`${dictBlock(names,rows)}\nprint(sum(p["rows"] for p in pipelines))`,
+    lore:`The grand ledger totals ${tot}. The vault's true weight is known.`,
+    explain:`A generator <code>p["rows"] for p in pipelines</code> pulls each <code>rows</code> value, and <code>sum(...)</code> adds them into one total.`
+  };
+});
+ARCH.adv.push((r,w)=>{ // 3 average report f-string
+  const k=ri(r,3,4), names=pickN(r,PIPE,k), rows=numList(r,k,300,2400);
+  const avg=Math.floor(rows.reduce((a,b)=>a+b,0)/rows.length);
+  const exp=`Average rows: ${avg}`;
+  return {
+    title:"The Scribe's Report",
+    story:`The scribe will publish but one line for the whole vault: the balance point of all the pipelines' rows, any fraction shaved away, woven into a single sentence.`,
+    task:`Inscribe this exact line, the whole-number average woven into the words:<br><code>${exp}</code>`,
+    expected:exp,
+    starter:`${dictBlock(names,rows)}\n# print "Average rows: <number>"\n`,
+    hints:["Gather the total, share it across the count keeping only the whole part, then weave that number into the sentence.",`print(f"Average rows: {avg}")`],
+    solution:`${dictBlock(names,rows)}\ntotal = sum(p["rows"] for p in pipelines)\navg = total // len(pipelines)\nprint(f"Average rows: {avg}")`,
+    lore:`The report reads "${exp}". The scribe seals it with wax.`,
+    explain:`Sum the rows, divide by the count with <code>//</code> for a whole-number average, then weave it into the f-string sentence.`
+  };
+});
+ARCH.adv.push((r,w)=>{ // 4 factorial
+  const n=ri(r,3,7); let f=1; for(let j=1;j<=n;j++) f*=j;
+  return {
+    title:"The Spiral of Multiplying Runes",
+    story:`A spiral staircase climbs through ${n} runes. Each rune you pass multiplies your strength by its own number - the first by one, the next by two, and so on to the top.`,
+    task:`Climb all ${n} runes and reveal the strength you carry out at the summit.`,
+    expected:String(f),
+    starter:`n = ${n}\nresult = 1\n# multiply 1..n then print\n`,
+    hints:["Start holding one, then walk the numbers from 1 up to n, multiplying each into what you already hold.",`result = 1\nfor i in range(1, n + 1):\n    result *= i\nprint(result)`],
+    solution:`n = ${n}\nresult = 1\nfor i in range(1, n + 1):\n    result *= i\nprint(result)`,
+    lore:`The runes blaze: ${f}. The spiral completes and the door above unlocks.`,
+    explain:`Start <code>result</code> at 1, loop 1..n multiplying each into <code>result</code>; after the loop it holds n factorial.`
+  };
+});
+ARCH.adv.push((r,w)=>{ // 5 fibonacci nth
+  const n=ri(r,5,12); let a=0,b=1; for(let j=0;j<n;j++){ const t=b; b=a+b; a=t; }
+  return {
+    title:"The Whispering Sequence",
+    story:`An ancient sequence whispers in the dark, beginning 0, 1, 1, 2, ... Each new number is born from the two that came just before it.`,
+    task:`Let the whisper advance ${n} steps from its start, and reveal the value it rests upon.`,
+    expected:String(a),
+    starter:`n = ${n}\na, b = 0, 1\n# advance the sequence n times, then print a\n`,
+    hints:["Hold the last two values; each step, slide them forward so the pair becomes the second and their sum.",`a, b = 0, 1\nfor _ in range(n):\n    a, b = b, a + b\nprint(a)`],
+    solution:`n = ${n}\na, b = 0, 1\nfor _ in range(n):\n    a, b = b, a + b\nprint(a)`,
+    lore:`The sequence settles on ${a}. The whisper fades, satisfied.`,
+    explain:`Hold the last two numbers in <code>a</code>, <code>b</code>; each step <code>a, b = b, a + b</code> slides the pair forward; after n steps <code>a</code> is the answer.`
+  };
+});
+ARCH.adv.push((r,w)=>{ // 6 filter-map-sum
+  const k=ri(r,5,7), nums=numList(r,k,5,60), kt=ri(r,15,35);
+  const s=nums.filter(x=>x>kt).reduce((acc,x)=>acc+x*2,0);
+  return {
+    title:"The Doubling Forge",
+    story:`Only ingots heavier than ${kt} are worthy of the forge. Each worthy one is hammered to twice its weight; the rest are cast aside. The smith wants the worthy, doubled, weighed as one.`,
+    task:`Reveal the single weight of every ingot above <code>${kt}</code> once each has been doubled and the survivors gathered together.`,
+    expected:String(s),
+    starter:`nums = ${pyList(nums)}\nkt = ${kt}\n# print the doubled-and-summed total\n`,
+    hints:["In one pass, keep only the values that pass the test, transform each as you keep it, and add them together.","print(sum(x * 2 for x in nums if x > kt))"],
+    solution:`nums = ${pyList(nums)}\nkt = ${kt}\nprint(sum(x * 2 for x in nums if x > kt))`,
+    lore:`The forge yields ${s}. The doubled ingots cool into a single bar.`,
+    explain:`In one pass the generator keeps values above the limit (<code>if x &gt; kt</code>), doubles each (<code>x * 2</code>), and <code>sum(...)</code> adds them.`
+  };
+});
+ARCH.adv.push((r,w)=>{ // 7 double each
+  const k=ri(r,4,6), nums=numList(r,k,3,40);
+  const dbl=nums.map(x=>x*2);
+  return {
+    title:"Mirror of Twins",
+    story:`An enchanted mirror stands before the row of ingots. Whatever passes before it is reflected back as twice itself, each in its own place.`,
+    task:`Reveal the whole reflected row, every value returned as twice what it was, in the same order.`,
+    expected:pyList(dbl),
+    starter:`nums = ${pyList(nums)}\n# print each value doubled\n`,
+    hints:["Build a fresh list in one line by walking the old one and transforming each value as you go.","print([x * 2 for x in nums])"],
+    solution:`nums = ${pyList(nums)}\nprint([x * 2 for x in nums])`,
+    lore:`The mirror shows ${pyList(dbl)}. Every ingot meets its twin.`,
+    explain:`<code>[x * 2 for x in nums]</code> walks the list and returns each value doubled, in order.`
+  };
+});
+ARCH.adv.push((r,w)=>{ // 8 top-3 desc
+  const k=ri(r,5,7), loads=distinct(r,k,100,2000);
+  const top3=loads.slice().sort((a,b)=>b-a).slice(0,3);
+  return {
+    title:"The Three Champions",
+    story:`Of all the loads in the realm, only three may stand as champions in the arena - the very greatest, in order of their might, the strongest at the front.`,
+    task:`Reveal the three mightiest loads, ranked from greatest down to least.`,
+    expected:pyList(top3),
+    starter:`loads = ${pyList(loads)}\n# print the top 3, largest first\n`,
+    hints:["Order a fresh copy from largest to smallest, then take only the first three.","print(sorted(loads, reverse=True)[:3])"],
+    solution:`loads = ${pyList(loads)}\nprint(sorted(loads, reverse=True)[:3])`,
+    lore:`The three champions step forward: ${pyList(top3)}. The arena roars.`,
+    explain:`<code>sorted(loads, reverse=True)</code> orders largest first, then <code>[:3]</code> takes the top three.`
+  };
+});
+ARCH.adv.push((r,w)=>{ // 9 OOP - class + __init__ + method
+  const pl=pick(r,PIPE), rows=ri(r,200,5000);
+  const exp=`${pl} carries ${rows} rows`;
+  return {
+    title:"The Living Blueprint",
+    story:`The realm's architects no longer carve each pipeline by hand. They draw one <code>blueprint</code> - a class - and from it summon as many living pipelines as they need, each remembering its own name and weight.`,
+    task:`Draw a <code>Pipeline</code> blueprint that remembers a name and a row count, give it a method that announces itself, then summon one and let it speak this exact line:<br><code>${exp}</code>`,
+    expected:exp,
+    starter:`# Draw the blueprint, then summon one pipeline\nclass Pipeline:\n    def __init__(self, name, rows):\n        # store name and rows on self\n        pass\n    def announce(self):\n        # return the sentence\n        pass\n\n`,
+    hints:["A class is a blueprint. The __init__ method runs when you create an object and saves values onto self, like self.name = name.","The announce method should return an f-string that reads self.name and self.rows back.",`class Pipeline:\n    def __init__(self, name, rows):\n        self.name = name\n        self.rows = rows\n    def announce(self):\n        return f"{self.name} carries {self.rows} rows"\nprint(Pipeline("${pl}", ${rows}).announce())`],
+    solution:`class Pipeline:\n    def __init__(self, name, rows):\n        self.name = name\n        self.rows = rows\n    def announce(self):\n        return f"{self.name} carries {self.rows} rows"\nprint(Pipeline("${pl}", ${rows}).announce())`,
+    lore:`The blueprint breathes: "${exp}". One drawing, endless pipelines.`,
+    explain:`A class is a blueprint. <code>__init__</code> runs the moment you create an object and stores values on <code>self</code>; <code>announce</code> reads them back through <code>self</code>.`
+  };
+});
+ARCH.adv.push((r,w)=>{ // 10 OOP - method computing from attributes
+  const capv=ri(r,2000,9000), used=ri(r,100,1900), pl=pick(r,PIPE);
+  return {
+    title:"The Vault That Knows Itself",
+    story:`Deep beneath the ${pl} archive sits a vault that needs no keeper to count its room. Ask it, and it works out its own free space from the capacity and the load it carries within.`,
+    task:`Build a <code>Vault</code> that holds a <code>capacity</code> and an amount <code>used</code>, with a method <code>free()</code> that reveals the space remaining. Summon one of capacity <code>${capv}</code> holding <code>${used}</code>, and reveal its free space.`,
+    expected:String(capv-used),
+    starter:`# A vault that calculates its own free space\nclass Vault:\n    def __init__(self, capacity, used):\n        pass\n    def free(self):\n        pass\n\n`,
+    hints:["Save capacity and used onto self inside __init__, just as you would store any two values.","The free method should return self.capacity - self.used.",`class Vault:\n    def __init__(self, capacity, used):\n        self.capacity = capacity\n        self.used = used\n    def free(self):\n        return self.capacity - self.used\nprint(Vault(${capv}, ${used}).free())`],
+    solution:`class Vault:\n    def __init__(self, capacity, used):\n        self.capacity = capacity\n        self.used = used\n    def free(self):\n        return self.capacity - self.used\nprint(Vault(${capv}, ${used}).free())`,
+    lore:`The vault answers without a keeper: ${capv-used} free. It knows itself.`,
+    explain:`The object stores <code>capacity</code> and <code>used</code> on <code>self</code>; <code>free()</code> subtracts one from the other using the values the object carries.`
+  };
+});
+ARCH.adv.push((r,w)=>{ // 11 OOP - @property computed attribute
+  const total=ri(r,500,5000), errors=ri(r,1,200), pl=pick(r,PIPE);
+  return {
+    title:"The Self-Counting Batch",
+    story:`A batch in the ${pl} stream carries both its full tally and its tally of errors. The elders want to read its clean count as if it were a plain fact written on the batch - no brackets, no ceremony - yet it must always be worked out fresh.`,
+    task:`Build a <code>Batch</code> with a <code>total</code> and an <code>errors</code> count, and expose a <code>clean</code> value (read with no brackets) that is <code>total</code> minus <code>errors</code>. Summon a batch of <code>${total}</code> with <code>${errors}</code> errors and reveal its clean count.`,
+    expected:String(total-errors),
+    starter:`# Read .clean like an attribute, computed fresh each time\nclass Batch:\n    def __init__(self, total, errors):\n        pass\n\n`,
+    hints:["Store total and errors on self in __init__ as usual.","Mark a method with @property on the line above it; then return self.total - self.errors. You read it as batch.clean with no brackets.",`class Batch:\n    def __init__(self, total, errors):\n        self.total = total\n        self.errors = errors\n    @property\n    def clean(self):\n        return self.total - self.errors\nprint(Batch(${total}, ${errors}).clean)`],
+    solution:`class Batch:\n    def __init__(self, total, errors):\n        self.total = total\n        self.errors = errors\n    @property\n    def clean(self):\n        return self.total - self.errors\nprint(Batch(${total}, ${errors}).clean)`,
+    lore:`The batch reads itself clean: ${total-errors}. No ceremony, always fresh.`,
+    explain:`A <code>@property</code> turns a method into a computed attribute; you read <code>b.clean</code> with no brackets and Python runs the code behind it, returning <code>total - errors</code> freshly.`
+  };
+});
+ARCH.adv.push((r,w)=>{ // 12 OOP - inheritance + super()
+  const base=ri(r,50,500), mult=ri(r,2,5);
+  return {
+    title:"The Heir's Greater Power",
+    story:`Every node in the realm has its power. But a Gatekeeper node is no ordinary heir - it inherits a node's nature, then reaches back to its parent's strength and multiplies it ${mult}-fold to guard the gate.`,
+    task:`Build a <code>Node</code> whose <code>power()</code> returns its rows. Then build a <code>BossNode</code> that inherits from it and overrides <code>power()</code> to return the parent's power times <code>${mult}</code>. Summon a <code>BossNode</code> of <code>${base}</code> rows and reveal its power.`,
+    expected:String(base*mult),
+    starter:`# BossNode inherits from Node and extends its power\nclass Node:\n    def __init__(self, rows):\n        self.rows = rows\n    def power(self):\n        return self.rows\n\n`,
+    hints:["Write class BossNode(Node): to inherit everything from Node.","Inside BossNode's own power method, call super().power() to run the parent's version, then multiply the result.",`class Node:\n    def __init__(self, rows):\n        self.rows = rows\n    def power(self):\n        return self.rows\nclass BossNode(Node):\n    def power(self):\n        return super().power() * ${mult}\nprint(BossNode(${base}).power())`],
+    solution:`class Node:\n    def __init__(self, rows):\n        self.rows = rows\n    def power(self):\n        return self.rows\nclass BossNode(Node):\n    def power(self):\n        return super().power() * ${mult}\nprint(BossNode(${base}).power())`,
+    lore:`The heir's power blazes: ${base*mult}. It guards the gate with its parent's strength multiplied.`,
+    explain:`<code>BossNode</code> inherits from <code>Node</code>; overriding <code>power()</code> and calling <code>super().power()</code> runs the parent's version first, then multiplies - extending rather than replacing.`
+  };
+});
+
+/* ---------- build 1000 levels ---------- */
+function tierOf(w){ return w<=6?'basic':(w<=13?'inter':'adv'); }
+function buildLevels(){
+  const L=[];
+  for(let i=0;i<1000;i++){
+    const w=Math.floor(i/50), tier=tierOf(w);
+    const r=rng((0x9e3779b9 ^ (i*2654435761))>>>0);
+    const arr=ARCH[tier], fn=arr[i%arr.length];
+    const lvl=fn(r,w);
+    lvl.idx=i;
+    lvl.tier=tier;
+    lvl.world="World "+(w+1)+" - "+WORLD_NAMES[w];
+    lvl.worldIdx=w;
+    lvl.boss=((i+1)%50===0);
+    if(lvl.boss) lvl.title="Gatekeeper - "+lvl.title;
+    L.push(lvl);
+  }
+  return L;
+}
+const LEVELS=buildLevels();
+LEVELS.forEach(l=>{ l.check=(exp=>o=>norm(o)===exp)(l.expected); });
+
+/* ============================================================
+   ARTICLES (original, copyright-clean)
+   ============================================================ */
+const READS=[
+ {id:"claude",ico:"📘",title:"Working with an AI assistant",source:"Python Quest - original guide",body:`
+   <p>An AI assistant is a tool that turns plain language into useful output: code, summaries, explanations, drafts. The skill is not in the typing; it is in the asking.</p>
+   <h4>Three habits that help</h4>
+   <ul>
+     <li><b>Be specific.</b> "Write a Python loop that prints the squares of 1 to 10" beats "write a loop".</li>
+     <li><b>Show an example of the output you want.</b> The assistant matches patterns, so a sample is worth a paragraph.</li>
+     <li><b>Iterate.</b> Treat the first answer as a draft. Ask for changes the way you would brief a colleague.</li>
+   </ul>
+   <p>When you are stuck on a puzzle here, describe what you tried and what happened. Naming the problem out loud is often half the solution.</p>
+   <div class="why"><strong>Why it matters for your work:</strong> Whether you are building a pipeline or a slide, the people who get the most from AI are those who brief it clearly and refine its output, rather than expecting a perfect answer in one shot.</div>`},
+ {id:"prompting",ico:"✍️",title:"How to write a good prompt",source:"Python Quest - original guide",body:`
+   <p>A prompt is an instruction. The clearer the instruction, the better the result. A simple structure works almost every time.</p>
+   <h4>Role, Task, Context, Format</h4>
+   <ul>
+     <li><b>Role:</b> who should the AI act as? ("You are a Python tutor.")</li>
+     <li><b>Task:</b> what exactly do you want done?</li>
+     <li><b>Context:</b> the background it needs - data shape, audience, constraints.</li>
+     <li><b>Format:</b> how should the answer look? A list, a table, code only.</li>
+   </ul>
+   <p>If an answer misses, change one thing at a time and ask again. You are steering, not gambling.</p>
+   <div class="why"><strong>Why it matters for your work:</strong> The same four-part structure that improves a coding prompt also improves a request for a data summary, an email draft, or a stakeholder update.</div>`},
+ {id:"dataeng",ico:"🛠️",title:"Data Engineering Basics",source:"Python Quest - original guide",body:`
+   <p>Data engineering is the craft of moving data from where it is created to where it can be used, reliably and repeatedly.</p>
+   <h4>The core idea: a pipeline</h4>
+   <p>A pipeline has stages. A common shape is <b>Extract, Transform, Load</b> (ETL): pull data from a source, reshape and clean it, then write it somewhere people can query.</p>
+   <ul>
+     <li><b>Extract:</b> read from a database, file, or stream.</li>
+     <li><b>Transform:</b> filter rows, fix types, join tables, compute aggregates.</li>
+     <li><b>Load:</b> write the result into a warehouse or lake.</li>
+   </ul>
+   <p>Many puzzles in this game are tiny transforms: filtering a list, summing values, sorting records. That is the heart of the job, scaled down.</p>
+   <div class="why"><strong>Why it matters for your work:</strong> Every dashboard and model depends on a pipeline behind it. Understanding the stages helps you reason about where things break and where quality is won or lost.</div>`},
+ {id:"dataquality",ico:"✅",title:"Why data quality matters",source:"Python Quest - original guide",body:`
+   <p>Good decisions need trustworthy data. Data quality is how much you can rely on what the numbers say.</p>
+   <h4>Common dimensions</h4>
+   <ul>
+     <li><b>Accuracy:</b> does it reflect reality?</li>
+     <li><b>Completeness:</b> are values missing?</li>
+     <li><b>Consistency:</b> does the same fact agree across systems?</li>
+     <li><b>Timeliness:</b> is it fresh enough to act on?</li>
+   </ul>
+   <p>A small check - counting rows, spotting an out-of-range value, confirming a total - can catch a problem before it reaches a leader's screen.</p>
+   <div class="why"><strong>Why it matters for your work:</strong> A pipeline that runs perfectly but moves wrong data is worse than no pipeline, because it spreads false confidence. Quality checks are cheap insurance.</div>`},
+ {id:"datamgmt",ico:"🗂️",title:"Data management in a nutshell",source:"Python Quest - original guide",body:`
+   <p>Data management is the set of practices that keep data findable, usable, and safe over its whole life.</p>
+   <h4>Pillars worth knowing</h4>
+   <ul>
+     <li><b>Governance:</b> who owns what, and who may use it.</li>
+     <li><b>Cataloguing:</b> a searchable index so people can find data without asking around.</li>
+     <li><b>Lineage:</b> a map of where each value came from and what touched it.</li>
+     <li><b>Security:</b> the right access for the right people, and no more.</li>
+   </ul>
+   <p>These are not bureaucracy for its own sake. They are what let a large organisation treat data as a shared asset rather than a thousand private spreadsheets.</p>
+   <div class="why"><strong>Why it matters for your work:</strong> Strong management is what turns scattered tables into a foundation others can build on with confidence. It is the difference between data that compounds in value and data that decays.</div>`},
+ {id:"aibasics",ico:"🤖",title:"AI Basics",source:"Python Quest - original guide",body:`
+   <p>Modern AI learns patterns from large amounts of examples, then uses those patterns to make predictions or generate new content.</p>
+   <h4>A few plain definitions</h4>
+   <ul>
+     <li><b>Model:</b> the trained system that takes an input and produces an output.</li>
+     <li><b>Training:</b> the process of adjusting the model by showing it many examples.</li>
+     <li><b>Inference:</b> using the finished model to answer a new question.</li>
+     <li><b>Large language model:</b> a model trained on text that can read and write in natural language.</li>
+   </ul>
+   <p>AI does not "know" facts the way a database does. It predicts what is likely. That is why it is brilliant at drafting and explaining, and why its claims still deserve a human check.</p>
+   <div class="why"><strong>Why it matters for your work:</strong> Knowing what AI is good at - drafting, summarising, explaining, pattern-spotting - and where it needs verification lets you use it as a force multiplier rather than a black box.</div>`},
+ {id:"storytelling",ico:"📊",title:"Storytelling in creating PowerPoint",source:"Python Quest - original guide",body:`
+   <p>A great deck is not a wall of charts. It is a story that carries the audience from a question to a decision.</p>
+   <h4>A simple narrative arc</h4>
+   <ul>
+     <li><b>Context:</b> the situation everyone agrees on.</li>
+     <li><b>Complication:</b> what changed, or what is at risk.</li>
+     <li><b>Question:</b> the decision now on the table.</li>
+     <li><b>Answer:</b> your recommendation, backed by the data.</li>
+   </ul>
+   <h4>On each slide</h4>
+   <p>Make the title the message ("Costs fell 12% after the migration"), not the topic ("Costs"). Use one chart per slide, and highlight the single number that matters. White space is your friend.</p>
+   <div class="why"><strong>Why it matters for your work:</strong> The analysis is only half the job. A clear story is what moves a room from nodding along to actually deciding, which is where your work creates impact.</div>`},
+ {id:"antigravity",ico:"🛰️",title:"The mindset of a lifelong learner",source:"Python Quest - original guide",body:`
+   <p>The most valuable skill in a fast-changing field is not any single tool. It is the ability to keep learning.</p>
+   <h4>Habits that compound</h4>
+   <ul>
+     <li><b>Learn in public.</b> Share what you build. Teaching cements understanding.</li>
+     <li><b>Embrace small failures.</b> A red error message is a clue, not a verdict.</li>
+     <li><b>Build tiny things often.</b> Ten small finished projects teach more than one grand unfinished one.</li>
+   </ul>
+   <p>This very game is built on that idea: attempt, stumble, read, retry. The stumble is not a detour from learning. It is the path.</p>
+   <div class="why"><strong>Why it matters for your work:</strong> Tools will keep changing. The colleague who treats every obstacle as something to learn from will stay valuable no matter which platform is in fashion next year.</div>`}
+];
+
+/* ============================================================
+   BADGES
+   ============================================================ */
+const BADGES=[
+ {id:"first",ico:"🌱",label:"First Light",test:s=>doneCount()>=1},
+ {id:"pathfinder",ico:"🧭",label:"Pathfinder (10)",test:s=>doneCount()>=10},
+ {id:"region",ico:"🏔️",label:"Region Cleared (50)",test:s=>doneCount()>=50},
+ {id:"trailblazer",ico:"⚡",label:"Trailblazer (200)",test:s=>doneCount()>=200},
+ {id:"restorer",ico:"🛡️",label:"Realm Restorer (500)",test:s=>doneCount()>=500},
+ {id:"grandmaster",ico:"👑",label:"Grandmaster (1000)",test:s=>doneCount()>=1000},
+ {id:"curious",ico:"📖",label:"Curious Mind",test:s=>s.reads.length>=1},
+ {id:"scholar",ico:"🎓",label:"Scholar (5 reads)",test:s=>s.reads.length>=5},
+ {id:"flawless",ico:"💎",label:"Flawless Ten",test:s=>perfectCount()>=10}
+];
+
+/* ============================================================
+   STATE
+   ============================================================ */
+const STORE="pyquest_progress_v2";
+function blank(){ return { stars:{}, xp:0, badges:[], reads:[] }; }
+function load(){ try{ return Object.assign(blank(), JSON.parse(localStorage.getItem(STORE)||"{}")); }catch(e){ return blank(); } }
+function save(){ localStorage.setItem(STORE, JSON.stringify(state)); }
+let state=load();
+let pyodide=null, current=0, currentWorld=0, attempts=0, hintsShown=0, lastOutput="", forcedActive=false, pyReady=false, expectedShown=false, countedFails=new Set();
+
+const XP_PER_STAR=50, READ_XP=20, STUCK_AT=3, FORCE_AT=5;
+const HINT_COST=10, HINT_GATE=2;
+
+function doneCount(){ return Object.keys(state.stars).length; }
+function perfectCount(){ return Object.values(state.stars).filter(v=>v>=3).length; }
+function isDone(i){ return state.stars[i]>0; }
+function worldDone(w){ let c=0; for(let i=w*50;i<w*50+50;i++) if(isDone(i)) c++; return c; }
+function worldStars(w){ let c=0; for(let i=w*50;i<w*50+50;i++) c+=(state.stars[i]||0); return c; }
+function worldUnlocked(w){ return w===0 || isDone(w*50-1); }
+
+/* ============================================================
+   RENDER: HUD + BADGES + WORLDS + GRID
+   ============================================================ */
+function refreshHUD(){
+  document.getElementById("hud-stars").textContent=Object.values(state.stars).reduce((a,b)=>a+b,0);
+  document.getElementById("hud-xp").textContent=state.xp;
+  document.getElementById("hud-done").textContent=doneCount();
+  document.getElementById("hud-badges").textContent=state.badges.length;
+}
+function renderBadges(){
+  const box=document.getElementById("badges"); box.innerHTML="";
+  BADGES.forEach(b=>{
+    const earned=state.badges.includes(b.id);
+    const d=document.createElement("div");
+    d.className="badge"+(earned?" earned":"");
+    d.innerHTML=`<span class="bi">${b.ico}</span> ${b.label}`;
+    box.appendChild(d);
+  });
+}
+function tierClass(w){ const t=tierOf(w); return t==='basic'?'tier-basic':(t==='inter'?'tier-inter':'tier-adv'); }
+function tierLabel(w){ const t=tierOf(w); return t==='basic'?'Basic':(t==='inter'?'Intermediate':'Advanced'); }
+function renderWorlds(){
+  const box=document.getElementById("worlds"); box.innerHTML="";
+  for(let w=0;w<20;w++){
+    const unlocked=worldUnlocked(w), done=worldDone(w), pct=Math.round(done/50*100);
+    const c=document.createElement("div");
+    c.className="world-card "+tierClass(w)+(unlocked?"":" locked");
+    c.innerHTML=`
+      <div class="wc-top">
+        <div>
+          <div class="wc-name">${WORLD_NAMES[w]}</div>
+          <div class="wc-tier">${tierLabel(w)} · World ${w+1}</div>
+        </div>
+        <div class="ring" style="--p:${pct}"><i>${done}</i></div>
+      </div>
+      <div class="wc-foot">
+        <span class="wc-ico">${WORLD_ICO[w]}</span>
+        <span>${unlocked?`${done}/50 nodes · ${worldStars(w)}★`:`<span class="wc-lock">🔒 Clear World ${w} to unlock</span>`}</span>
+      </div>`;
+    if(unlocked) c.onclick=()=>openWorld(w);
+    box.appendChild(c);
+  }
+}
+function openWorld(w){
+  currentWorld=w;
+  document.getElementById("lv-world").textContent=`${WORLD_ICO[w]} ${WORLD_NAMES[w]}`;
+  document.getElementById("lv-crumb").textContent=`${tierLabel(w)} · ${worldDone(w)}/50 restored`;
+  const grid=document.getElementById("grid"); grid.innerHTML="";
+  for(let i=w*50;i<w*50+50;i++){
+    const lvl=LEVELS[i], done=isDone(i), boss=lvl.boss;
+    const prevDone = (i===w*50) ? true : isDone(i-1);
+    const unlocked = done || prevDone;
+    const n=document.createElement("div");
+    n.className="node"+(done?" done":"")+(boss?" boss":"")+(unlocked?"":" locked");
+    const st=state.stars[i]||0;
+    n.innerHTML=`${boss?'<span class="bico">👑</span>':''}${(i%50)+1}<span class="st">${done?'★'.repeat(st):''}</span>`;
+    if(unlocked) n.onclick=()=>openLevel(i);
+    grid.appendChild(n);
+  }
+  showScreen("levelsScreen");
+}
+
+/* ============================================================
+   CHALLENGE
+   ============================================================ */
+/* ============================================================
+   PER-LEVEL CARTOON SPRITES (inline SVG, offline-safe)
+   Ten friendly creatures cheer the player on - one shows at each
+   level. Look for your buddy in the top-right of The Quest panel.
+   ============================================================ */
+const SPRITES=[
+  `<svg viewBox="0 0 64 64"><g class="bob"><rect x="18" y="20" width="28" height="24" rx="6" fill="#7a3cf0"/><rect x="24" y="27" width="7" height="7" rx="2" fill="#fff"/><rect x="33" y="27" width="7" height="7" rx="2" fill="#fff"/><circle cx="27.5" cy="30.5" r="2" fill="#160d14"/><circle cx="36.5" cy="30.5" r="2" fill="#160d14"/><rect x="27" y="38" width="10" height="3" rx="1.5" fill="#FFD23F"/><line x1="32" y1="20" x2="32" y2="12" stroke="#FFD23F" stroke-width="2"/><circle cx="32" cy="11" r="3" fill="#E63946"/></g></svg>`,
+  `<svg viewBox="0 0 64 64"><g class="bob"><ellipse cx="30" cy="38" rx="18" ry="14" fill="#16A34A"/><path d="M44 32 q10 -2 12 6 q-8 0 -12 4 Z" fill="#16A34A"/><circle cx="24" cy="33" r="4" fill="#fff"/><circle cx="24" cy="33" r="2" fill="#160d14"/><path d="M16 28 l4 -7 l3 7 Z" fill="#FFD23F"/><path d="M30 26 l4 -8 l3 8 Z" fill="#FFD23F"/><path d="M22 44 q4 4 10 2" stroke="#0a5" stroke-width="2" fill="none"/></g></svg>`,
+  `<svg viewBox="0 0 64 64"><g class="bob"><circle cx="32" cy="34" r="16" fill="#FFB020"/><path d="M20 22 l-2 -9 l9 5 Z" fill="#FFB020"/><path d="M44 22 l2 -9 l-9 5 Z" fill="#FFB020"/><circle cx="26" cy="32" r="3" fill="#160d14"/><circle cx="38" cy="32" r="3" fill="#160d14"/><path d="M30 38 q2 2 4 0" stroke="#160d14" stroke-width="2" fill="none"/><circle cx="23" cy="37" r="3" fill="#FF5630" opacity=".5"/><circle cx="41" cy="37" r="3" fill="#FF5630" opacity=".5"/></g></svg>`,
+  `<svg viewBox="0 0 64 64"><g class="bob"><ellipse cx="32" cy="36" rx="15" ry="17" fill="#7a3cf0"/><circle cx="26" cy="30" r="7" fill="#fff"/><circle cx="38" cy="30" r="7" fill="#fff"/><circle cx="26" cy="30" r="3" fill="#160d14"/><circle cx="38" cy="30" r="3" fill="#160d14"/><path d="M30 36 l4 0 l-2 4 Z" fill="#FFD23F"/><path d="M20 20 l6 5 M44 20 l-6 5" stroke="#7a3cf0" stroke-width="3"/></g></svg>`,
+  `<svg viewBox="0 0 64 64"><g class="bob"><ellipse cx="32" cy="36" rx="15" ry="13" fill="#E9A06B"/><ellipse cx="18" cy="34" rx="5" ry="9" fill="#8a5a32"/><ellipse cx="46" cy="34" rx="5" ry="9" fill="#8a5a32"/><circle cx="27" cy="34" r="2.6" fill="#160d14"/><circle cx="37" cy="34" r="2.6" fill="#160d14"/><circle cx="32" cy="40" r="3" fill="#160d14"/><path d="M32 43 v3" stroke="#160d14" stroke-width="2"/></g></svg>`,
+  `<svg viewBox="0 0 64 64"><g class="bob"><rect x="29" y="34" width="6" height="14" rx="3" fill="#16A34A"/><path d="M32 12 l4 9 l10 1 l-7 7 l2 10 l-9 -5 l-9 5 l2 -10 l-7 -7 l10 -1 Z" fill="#FFD23F"/><circle cx="28" cy="24" r="2" fill="#160d14"/><circle cx="36" cy="24" r="2" fill="#160d14"/><path d="M29 28 q3 2 6 0" stroke="#160d14" stroke-width="1.6" fill="none"/></g></svg>`,
+  `<svg viewBox="0 0 64 64"><g class="bob"><ellipse cx="32" cy="34" rx="18" ry="12" fill="#cfe6ff"/><circle cx="20" cy="34" r="9" fill="#cfe6ff"/><circle cx="44" cy="34" r="9" fill="#cfe6ff"/><circle cx="27" cy="33" r="2.6" fill="#160d14"/><circle cx="37" cy="33" r="2.6" fill="#160d14"/><path d="M29 38 q3 3 6 0" stroke="#160d14" stroke-width="2" fill="none"/><path d="M14 44 l3 6 M50 44 l-3 6" stroke="#FFD23F" stroke-width="2"/></g></svg>`,
+  `<svg viewBox="0 0 64 64"><g class="bob"><path d="M32 20 l14 10 l-6 16 l-16 0 l-6 -16 Z" fill="#FF5630"/><path d="M22 22 l4 8 l-9 -2 Z" fill="#FF5630"/><path d="M42 22 l-4 8 l9 -2 Z" fill="#FF5630"/><ellipse cx="32" cy="40" rx="8" ry="6" fill="#FFE08A"/><circle cx="27" cy="33" r="2.6" fill="#160d14"/><circle cx="37" cy="33" r="2.6" fill="#160d14"/><circle cx="32" cy="39" r="2.4" fill="#160d14"/></g></svg>`,
+  `<svg viewBox="0 0 64 64"><g class="bob"><rect x="20" y="28" width="24" height="20" rx="8" fill="#9fe"/><rect x="23" y="10" width="6" height="18" rx="3" fill="#9fe"/><rect x="35" y="10" width="6" height="18" rx="3" fill="#9fe"/><circle cx="28" cy="37" r="3" fill="#160d14"/><circle cx="36" cy="37" r="3" fill="#160d14"/><rect x="29" y="43" width="6" height="2.4" rx="1.2" fill="#E63946"/></g></svg>`,
+  `<svg viewBox="0 0 64 64"><g class="bob"><path d="M32 14 l16 10 l-6 22 l-20 0 l-6 -22 Z" fill="#E63946"/><path d="M32 14 l16 10 l-16 6 l-16 -6 Z" fill="#FF7A85"/><circle cx="27" cy="32" r="2.8" fill="#fff"/><circle cx="37" cy="32" r="2.8" fill="#fff"/><circle cx="27" cy="32" r="1.3" fill="#160d14"/><circle cx="37" cy="32" r="1.3" fill="#160d14"/><path d="M29 38 q3 2 6 0" stroke="#160d14" stroke-width="1.8" fill="none"/></g></svg>`
+];
+function spriteFor(i){ return SPRITES[i % SPRITES.length]; }
+
+/* ============================================================
+   ANIME-STYLE BACKDROPS (inline SVG, offline-safe, character-free)
+   Four gentle, all-ages scenes rotate behind the challenge panels.
+   ============================================================ */
+const ANIME_BG=[
+  /* 0 - torii sunrise */
+  `<svg viewBox="0 0 800 400" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+    <defs><linearGradient id="ab0sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#3a1530"/><stop offset="55%" stop-color="#E63946"/><stop offset="100%" stop-color="#FFB020"/></linearGradient></defs>
+    <rect width="800" height="400" fill="url(#ab0sky)"/>
+    <circle cx="400" cy="250" r="120" fill="#FFD23F" opacity=".85"/>
+    <g fill="#fff" opacity=".5"><circle cx="120" cy="60" r="2"/><circle cx="680" cy="50" r="2.5"/><circle cx="240" cy="40" r="1.8"/><circle cx="560" cy="80" r="2"/></g>
+    <path d="M0 320 Q200 290 400 315 T800 320 V400 H0 Z" fill="#2a0e1c" opacity=".85"/>
+    <g fill="#160d14">
+      <rect x="250" y="170" width="20" height="170"/><rect x="530" y="170" width="20" height="170"/>
+      <rect x="225" y="158" width="350" height="18" rx="4"/><rect x="240" y="180" width="320" height="12"/>
+    </g>
+  </svg>`,
+  /* 1 - sakura riverside */
+  `<svg viewBox="0 0 800 400" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+    <defs><linearGradient id="ab1sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#7a3cf0"/><stop offset="100%" stop-color="#FF7A85"/></linearGradient></defs>
+    <rect width="800" height="400" fill="url(#ab1sky)"/>
+    <path d="M0 300 Q200 280 400 300 T800 300 V400 H0 Z" fill="#0066CC" opacity=".55"/>
+    <g fill="#FFB6C1" opacity=".9">
+      <circle cx="90" cy="120" r="38"/><circle cx="130" cy="100" r="30"/><circle cx="60" cy="95" r="26"/><circle cx="110" cy="150" r="28"/>
+      <circle cx="710" cy="110" r="40"/><circle cx="670" cy="90" r="28"/><circle cx="745" cy="95" r="26"/>
+    </g>
+    <rect x="100" y="150" width="10" height="160" fill="#5a3a2a"/><rect x="705" y="140" width="10" height="170" fill="#5a3a2a"/>
+    <g fill="#FFD7E0" opacity=".8"><circle cx="300" cy="120" r="4"/><circle cx="420" cy="180" r="3.5"/><circle cx="520" cy="140" r="4"/><circle cx="360" cy="220" r="3"/><circle cx="480" cy="240" r="3.5"/></g>
+  </svg>`,
+  /* 2 - starry hills */
+  `<svg viewBox="0 0 800 400" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+    <defs><linearGradient id="ab2sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#160d28"/><stop offset="100%" stop-color="#3a1530"/></linearGradient></defs>
+    <rect width="800" height="400" fill="url(#ab2sky)"/>
+    <g fill="#FFD23F">
+      <circle cx="120" cy="70" r="2.5"/><circle cx="240" cy="50" r="1.8"/><circle cx="360" cy="90" r="2.2"/><circle cx="500" cy="60" r="2"/>
+      <circle cx="620" cy="100" r="2.6"/><circle cx="700" cy="60" r="2"/><circle cx="80" cy="140" r="1.6"/><circle cx="560" cy="130" r="1.8"/></g>
+    <circle cx="640" cy="110" r="46" fill="#F3F4F6" opacity=".9"/><circle cx="660" cy="100" r="40" fill="#3a1530"/>
+    <path d="M0 300 Q150 230 320 290 T800 270 V400 H0 Z" fill="#1f0f1a"/>
+    <path d="M0 340 Q220 290 460 330 T800 330 V400 H0 Z" fill="#160d14"/>
+  </svg>`,
+  /* 3 - calm seaside */
+  `<svg viewBox="0 0 800 400" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+    <defs><linearGradient id="ab3sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0066CC"/><stop offset="100%" stop-color="#FFD23F"/></linearGradient></defs>
+    <rect width="800" height="400" fill="url(#ab3sky)"/>
+    <circle cx="400" cy="170" r="70" fill="#FFF4CC" opacity=".9"/>
+    <path d="M0 250 H800 V400 H0 Z" fill="#00A79D" opacity=".75"/>
+    <g stroke="#fff" stroke-width="3" fill="none" opacity=".5">
+      <path d="M0 290 Q100 280 200 290 T400 290 T600 290 T800 290"/>
+      <path d="M0 330 Q100 320 200 330 T400 330 T600 330 T800 330"/></g>
+    <g fill="#fff" opacity=".55"><ellipse cx="180" cy="90" rx="40" ry="14"/><ellipse cx="620" cy="70" rx="50" ry="16"/></g>
+  </svg>`
+];
+function animeFor(i){ return ANIME_BG[i % ANIME_BG.length]; }
+
+function openLevel(i){
+  current=i; currentWorld=Math.floor(i/50); attempts=0; hintsShown=0; lastOutput=""; forcedActive=false; expectedShown=false; countedFails=new Set();
+  const lvl=LEVELS[i];
+  document.getElementById("ch-sprite").innerHTML=spriteFor(i);
+  document.getElementById("animeBg").innerHTML=animeFor(i);
+  document.getElementById("ch-title").textContent=(lvl.boss?"👑 ":"")+lvl.title;
+  document.getElementById("ch-crumb").textContent=`${WORLD_NAMES[currentWorld]} · Node ${(i%50)+1}/50`;
+  document.getElementById("ch-story").innerHTML=lvl.story;
+  document.getElementById("ch-task").innerHTML=lvl.task;
+  const hb=document.getElementById("ch-hints"); hb.innerHTML="";
+  lvl.hints.forEach((h,k)=>{
+    const d=document.createElement("div"); d.className="hint"; d.id="hint-"+k;
+    d.innerHTML=`<b>Hint ${k+1}:</b> ${h.replace(/</g,"&lt;").replace(/>/g,"&gt;")}`;
+    hb.appendChild(d);
+  });
+  renderAttempts();
+  document.getElementById("code").value=lvl.starter;
+  document.getElementById("out").textContent="Run your code to see the output here.";
+  document.getElementById("out").className="out";
+  document.getElementById("btn-run").disabled=false;
+  document.getElementById("btn-check").disabled=false;
+  const hintBtn=document.getElementById("btn-hint");
+  hintBtn.textContent="💡 Hint (after "+HINT_GATE+" tries)";
+  hintBtn.disabled=false;
+  hintBtn.classList.remove("btn-reveal");
+  showScreen("challengeScreen");
+}
+
+function showWorlds(){ renderWorlds(); renderBadges(); refreshHUD(); showScreen("worldsScreen"); }
+function showScreen(id){
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+/* attempts meter - persistent on-screen counter */
+function renderAttempts(){
+  const meter=document.getElementById("attMeter");
+  const dots=document.getElementById("attDots");
+  const count=document.getElementById("attCount");
+  const hint=document.getElementById("attHint");
+  if(!meter||!dots||!count) return;
+  let html="";
+  for(let k=0;k<FORCE_AT;k++){
+    let cls="";
+    if(k<attempts) cls=(attempts>=FORCE_AT)?"crit":"miss";
+    html+=`<i class="${cls}"></i>`;
+  }
+  dots.innerHTML=html;
+  count.textContent=attempts+" / "+FORCE_AT;
+  meter.classList.remove("warn","locked");
+  if(forcedActive || attempts>=FORCE_AT){
+    meter.classList.add("locked");
+    if(hint) hint.textContent="Learning break required to continue";
+  }else if(attempts>=STUCK_AT){
+    meter.classList.add("warn");
+    if(hint) hint.textContent=(FORCE_AT-attempts)+" more before a learning break";
+  }else{
+    if(hint) hint.textContent="5 misses triggers a learning break";
+  }
+}
+
+/* ============================================================
+   PYODIDE RUN
+   ============================================================ */
+async function ensurePy(){
+  if(pyReady) return;
+  const out=document.getElementById("out");
+  out.textContent="Loading Python (first run only)...";
+  pyodide=await loadPyodide();
+  pyReady=true;
+}
+async function runCode(){
+  const out=document.getElementById("out");
+  const code=document.getElementById("code").value;
+  out.className="out"; out.textContent="Running...";
+  try{
+    await ensurePy();
+    let buf="";
+    pyodide.setStdout({batched:t=>buf+=t+"\n"});
+    pyodide.setStderr({batched:t=>buf+=t+"\n"});
+    await pyodide.runPythonAsync(code);
+    lastOutput=buf.replace(/\n$/,"");
+    out.className="out out-ok";
+    out.textContent=lastOutput===""?"(no output - did you use print()?)":lastOutput;
+  }catch(e){
+    const raw=String(e.message||e);
+    lastOutput="";
+    out.className="out out-err";
+    out.textContent=raw;
+    appendExplain(raw);
+  }
+}
+function appendExplain(raw){
+  const out=document.getElementById("out");
+  const div=document.createElement("div");
+  div.className="out-explain";
+  div.innerHTML=explainError(raw);
+  out.appendChild(div);
+}
+
+/* plain-English error parser */
+function explainError(raw){
+  const lines=raw.trim().split("\n").filter(x=>x.trim());
+  const last=lines[lines.length-1]||raw;
+  const m=last.match(/([A-Za-z_]*Error|Exception):?\s*(.*)$/);
+  const type=m?m[1]:"";
+  const detail=m?m[2]:"";
+  let msg;
+  switch(type){
+    case "SyntaxError":
+      msg="<b>Plain English:</b> Python could not understand the structure of a line. Check for a missing colon at the end of an <code>if</code>/<code>for</code>/<code>def</code> line, a missing closing bracket or quote, or an extra symbol."; break;
+    case "IndentationError":
+      msg="<b>Plain English:</b> A line is not spaced correctly. Code inside an <code>if</code>, <code>for</code> or <code>def</code> must be indented (4 spaces). Make sure indented lines line up."; break;
+    case "TabError":
+      msg="<b>Plain English:</b> You mixed tabs and spaces for indentation. Use spaces only (press Tab here and it inserts spaces)."; break;
+    case "NameError":{
+      const n=escHtml((detail.match(/'([^']+)'/)||[])[1]||"");
+      msg=`<b>Plain English:</b> Python met the name ${n?`<code>${n}</code>`:"something"} that was never defined. Check the spelling, or make sure you created that variable (and quote text values, e.g. <code>"hello"</code>).`; break;
+    }
+    case "TypeError":
+      msg="<b>Plain English:</b> You tried to combine values that do not fit together - for example adding a number to a piece of text. Convert with <code>str(...)</code> or <code>int(...)</code>, or check what each value holds."; break;
+    case "IndexError":
+      msg="<b>Plain English:</b> You asked for a list position that does not exist. Remember positions start at 0, so a list of 3 items has positions 0, 1 and 2."; break;
+    case "KeyError":{
+      const k=escHtml((detail.match(/'([^']+)'/)||[])[1]||"");
+      msg=`<b>Plain English:</b> You asked a dictionary for the key ${k?`<code>${k}</code>`:"a key"} that is not in it. Check the spelling and that the key exists.`; break;
+    }
+    case "ZeroDivisionError":
+      msg="<b>Plain English:</b> You divided by zero, which has no answer. Make sure the number you divide by is not 0."; break;
+    case "ValueError":
+      msg="<b>Plain English:</b> The value was the right type but the wrong content - for example <code>int(\"abc\")</code>. Check the value you passed in."; break;
+    case "AttributeError":
+      msg="<b>Plain English:</b> You used a method or property that this kind of value does not have. Check the spelling, or whether the value is the type you expect."; break;
+    case "ModuleNotFoundError":
+    case "ImportError":
+      msg="<b>Plain English:</b> Python could not find a library you tried to import. For these puzzles you do not need any imports - the built-in tools are enough."; break;
+    case "RecursionError":
+      msg="<b>Plain English:</b> A function kept calling itself with no stopping point. Make sure your loop or recursion has a clear end."; break;
+    default:
+      msg="<b>Plain English:</b> Something stopped the code from finishing. Read the last line above - it names the problem - then check that line in your code.";
+  }
+  return msg;
+}
+
+/* ============================================================
+   CHECK ANSWER
+   ============================================================ */
+async function checkAnswer(){
+  const lvl=LEVELS[current];
+  if(forcedActive){ return; }
+  await runCode();
+  if(lastOutput!=="" && lvl.check(lastOutput)){ succeed(); return; }
+  const key=norm(document.getElementById("code").value);
+  if(countedFails.has(key)){
+    toast("Same code as last time - change something, then run again to use a fresh attempt.");
+    return;
+  }
+  countedFails.add(key);
+  attempts++;
+  renderAttempts();
+  if(lastOutput===""){ toast("That attempt did not work yet ("+attempts+"/"+FORCE_AT+") - read the message above."); }
+  else{ toast("Not quite ("+attempts+"/"+FORCE_AT+") - the output does not match yet."); }
+  afterFail();
+}
+function afterFail(){
+  if(attempts>=STUCK_AT && attempts<FORCE_AT){ offerStuckHelp(); }
+  if(attempts>=FORCE_AT && !forcedActive){ forceRead(); }
+}
+function offerStuckHelp(){
+  const btn=document.getElementById("btn-learn");
+  btn.classList.add("btn-teal"); btn.classList.remove("btn-ghost");
+  btn.textContent="📚 Stuck? Take a learning break";
+  toast("Stuck? A short read might unlock it - try the learning break.");
+}
+
+/* award stars */
+function awardStars(){
+  if(hintsShown===0 && attempts<=1) return 3;
+  if(hintsShown<=1 && attempts<=3) return 2;
+  return 1;
+}
+function succeed(){
+  const stars=awardStars();
+  const prev=state.stars[current]||0;
+  if(stars>prev) state.stars[current]=stars;
+  state.xp += stars*XP_PER_STAR;
+  const newBadges=[];
+  BADGES.forEach(b=>{ if(!state.badges.includes(b.id) && b.test(state)){ state.badges.push(b.id); newBadges.push(b); } });
+  save(); refreshHUD();
+  confetti();
+  const lvl=LEVELS[current];
+  document.getElementById("rw-title").textContent=lvl.boss?"👑 Gatekeeper defeated!":"🎉 Node restored!";
+  document.getElementById("rw-stars").textContent="★ ".repeat(stars).trim()+"  "+"☆ ".repeat(3-stars).trim();
+  document.getElementById("rw-lore").innerHTML=lvl.lore;
+  document.getElementById("rw-explain").innerHTML=lvl.explain?('<span class="rwx-h">💡 How this solution works</span>'+lvl.explain):"";
+  document.getElementById("rw-badge").innerHTML=newBadges.length?("🏅 New badge: "+newBadges.map(b=>b.label).join(", ")):"";
+  document.getElementById("rewardOverlay").classList.add("show");
+}
+
+/* ============================================================
+   REWARD MODAL CONTROLS
+   ============================================================ */
+document.getElementById("rw-stay").onclick=()=>{ document.getElementById("rewardOverlay").classList.remove("show"); openWorld(currentWorld); };
+document.getElementById("rw-next").onclick=()=>{
+  document.getElementById("rewardOverlay").classList.remove("show");
+  const next=current+1;
+  if(next<1000 && (isDone(next)|| isDone(current))){
+    if(Math.floor(next/50)!==currentWorld && !worldUnlocked(Math.floor(next/50))){ openWorld(currentWorld); return; }
+    openLevel(next);
+  }else{ openWorld(currentWorld); }
+};
+
+/* ============================================================
+   LEARNING BREAK / FORCED READ
+   ============================================================ */
+function openBreak(mode){
+  const banner=document.getElementById("break-banner");
+  const xBtn=document.getElementById("break-x");
+  document.getElementById("articleView").style.display="none";
+  document.getElementById("readList").style.display="flex";
+  if(mode==='forced'){
+    banner.innerHTML=`<div class="forced-banner">🛑 <b>Five attempts reached.</b> The path is blocked until you learn something new. Choose <b>one</b> of these two reads to continue - finishing it resets your attempts and refreshes your thinking.</div>`;
+    xBtn.style.display="none";
+    document.getElementById("break-title").textContent="🛑 Forced learning gate";
+    renderReadList(pickTwoForced());
+  }else{
+    banner.innerHTML="";
+    xBtn.style.display="block";
+    document.getElementById("break-title").textContent="📚 Learning break";
+    renderReadList(READS);
+  }
+  document.getElementById("breakOverlay").classList.add("show");
+}
+function pickTwoForced(){
+  const unread=READS.filter(a=>!state.reads.includes(a.id));
+  const pool=unread.length>=2?unread:READS;
+  const r=rng((current*2654435761)>>>0);
+  const a=pool.slice();
+  const out=[];
+  for(let j=0;j<2 && a.length;j++){ out.push(a.splice(Math.floor(r()*a.length),1)[0]); }
+  return out;
+}
+function renderReadList(list){
+  const box=document.getElementById("readList"); box.innerHTML="";
+  list.forEach(a=>{
+    const read=state.reads.includes(a.id);
+    const c=document.createElement("div"); c.className="read-card";
+    c.innerHTML=`<div class="rc-t">${a.ico} ${a.title} ${read?'<span style="color:var(--green);font-size:12px;">✓ read</span>':''}</div><div class="rc-s">${a.source}</div>`;
+    c.onclick=()=>openArticle(a);
+    box.appendChild(c);
+  });
+}
+let activeArticle=null;
+function openArticle(a){
+  activeArticle=a;
+  document.getElementById("readList").style.display="none";
+  document.getElementById("articleView").style.display="block";
+  document.getElementById("articleBody").innerHTML=`<h2 style="color:#fff;font-size:19px;margin-bottom:4px;">${a.ico} ${a.title}</h2><div style="font-size:11.5px;color:#9fb0cc;margin-bottom:10px;">${a.source}</div>${a.body}`;
+}
+document.getElementById("art-back").onclick=()=>{
+  document.getElementById("articleView").style.display="none";
+  document.getElementById("readList").style.display="flex";
+};
+document.getElementById("art-done").onclick=()=>{
+  if(activeArticle && !state.reads.includes(activeArticle.id)){
+    state.reads.push(activeArticle.id);
+    state.xp+=READ_XP;
+    BADGES.forEach(b=>{ if(!state.badges.includes(b.id) && b.test(state)) state.badges.push(b.id); });
+    save(); refreshHUD();
+  }
+  if(forcedActive){
+    forcedActive=false; attempts=0; countedFails=new Set();
+    renderAttempts();
+    document.getElementById("btn-run").disabled=false;
+    document.getElementById("btn-check").disabled=false;
+    closeBreak();
+    toast("Fresh eyes - your attempts are reset. Try again.");
+  }else{
+    toast("+"+READ_XP+" XP for learning. Nice.");
+    document.getElementById("articleView").style.display="none";
+    document.getElementById("readList").style.display="flex";
+    renderReadList(forcedActive?pickTwoForced():READS);
+  }
+};
+function forceRead(){
+  forcedActive=true;
+  document.getElementById("btn-run").disabled=true;
+  document.getElementById("btn-check").disabled=true;
+  openBreak('forced');
+}
+function closeBreak(){ document.getElementById("breakOverlay").classList.remove("show"); }
+document.getElementById("break-x").onclick=()=>{ if(!forcedActive) closeBreak(); };
+document.getElementById("breakOverlay").onclick=(e)=>{ if(e.target.id==="breakOverlay" && !forcedActive) closeBreak(); };
+
+/* ============================================================
+   BUTTON WIRING
+   ============================================================ */
+document.getElementById("btn-run").onclick=checkAnswer;
+document.getElementById("btn-check").onclick=checkAnswer;
+document.getElementById("back-to-grid").onclick=()=>openWorld(currentWorld);
+document.getElementById("btn-learn").onclick=()=>openBreak('optional');
+document.getElementById("btn-hint").onclick=()=>{
+  const lvl=LEVELS[current];
+  const btn=document.getElementById("btn-hint");
+
+  // Gate: hints stay hidden until the player has genuinely tried (2 failed attempts).
+  if(attempts<HINT_GATE){
+    toast("Hints unlock after "+HINT_GATE+" attempts - give it a real try first ("+attempts+"/"+HINT_GATE+").");
+    return;
+  }
+
+  // All hints already used -> the button becomes the deliberate reveal affordance.
+  if(hintsShown>=lvl.hints.length){
+    revealExpected(lvl);
+    return;
+  }
+
+  // Each hint costs XP. No XP -> no free hints; send them to bank points on earlier levels.
+  if(state.xp<HINT_COST){
+    toast("Not enough XP for a hint. Replay earlier levels to build your point bank, then come back.");
+    return;
+  }
+
+  state.xp=Math.max(0,state.xp-HINT_COST);
+  save(); refreshHUD();
+  document.getElementById("hint-"+hintsShown).classList.add("show");
+  hintsShown++;
+  toast("Hint revealed (-"+HINT_COST+" XP).");
+
+  if(hintsShown>=lvl.hints.length){
+    btn.textContent="🔍 Reveal answer (-"+HINT_COST+" XP)";
+    btn.classList.add("btn-reveal");
+  }else{
+    btn.textContent="💡 Hint "+(hintsShown+1)+" (-"+HINT_COST+" XP)";
+  }
+};
+
+/* Deliberate, explicit-click reveal of the expected output - never shown automatically.
+   Only reachable after every hint is exhausted. Costs XP like a hint; gated on point bank. */
+function revealExpected(lvl){
+  if(expectedShown) return;
+  if(state.xp<HINT_COST){
+    toast("Not enough XP to reveal the answer. Replay earlier levels to build your point bank.");
+    return;
+  }
+  state.xp=Math.max(0,state.xp-HINT_COST);
+  expectedShown=true;
+  save(); refreshHUD();
+  const esc=String(lvl.expected).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  const box=document.getElementById("ch-hints");
+  const d=document.createElement("div");
+  d.className="hint reveal show";
+  d.innerHTML="<b>Expected output:</b><pre class=\"reveal-pre\">"+esc+"</pre>";
+  box.appendChild(d);
+  const btn=document.getElementById("btn-hint");
+  btn.textContent="Answer revealed";
+  btn.disabled=true;
+  toast("Expected output revealed (-"+HINT_COST+" XP). Match it to earn your star.");
+}
+document.getElementById("code").addEventListener("keydown",function(e){
+  if(e.key==="Tab"){ e.preventDefault(); const s=this.selectionStart,en=this.selectionEnd;
+    this.value=this.value.slice(0,s)+"    "+this.value.slice(en); this.selectionStart=this.selectionEnd=s+4; }
+  if((e.ctrlKey||e.metaKey)&&e.key==="Enter"){ e.preventDefault(); checkAnswer(); }
+});
+
+/* ============================================================
+   TOAST + CONFETTI
+   ============================================================ */
+let toastT=null;
+function toast(msg){
+  const t=document.getElementById("toast"); t.textContent=msg; t.classList.add("show");
+  clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove("show"),2600);
+}
+function confetti(){
+  const cols=["#00A79D","#0066CC","#F5C542","#16A34A","#F59E0B","#7a5cf0"];
+  for(let i=0;i<70;i++){
+    const c=document.createElement("div"); c.className="confetti";
+    c.style.left=Math.random()*100+"vw";
+    c.style.background=cols[i%cols.length];
+    c.style.transform=`rotate(${Math.random()*360}deg)`;
+    document.body.appendChild(c);
+    const dur=2000+Math.random()*1500;
+    c.animate([{top:"-20px",opacity:1},{top:"100vh",opacity:.2}],{duration:dur,easing:"cubic-bezier(.3,.7,.4,1)"});
+    setTimeout(()=>c.remove(),dur);
+  }
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+refreshHUD(); renderWorlds(); renderBadges();
+</script>
+</body>
+</html>
